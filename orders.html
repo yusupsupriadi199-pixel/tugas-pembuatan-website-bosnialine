@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pesanan Saya - BOSNIALine</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="cart.css">
+  <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="orders.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="index.html" class="logo">💻 BOSNIA<span>Line</span></a>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Cari produk...">
+      <button onclick="window.location.href='search.html?q='+document.getElementById('search-input').value">🔍</button>
+    </div>
+    <div class="nav-actions">
+      <button class="nav-btn cart-trigger" style="position:relative">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge" id="cart-badge" style="display:none">0</span>
+        <span>Keranjang</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- STATUS TABS — FIXED STICKY seperti Shopee -->
+<div class="orders-tab-bar" id="orders-tab-bar">
+  <div class="orders-tab-inner">
+    <button class="otb active" data-status="all" onclick="switchTab(this)">
+      <span class="otb-icon">📋</span>
+      <span class="otb-label">Semua</span>
+      <span class="otb-badge" id="badge-all"></span>
+    </button>
+    <button class="otb" data-status="pending" onclick="switchTab(this)">
+      <span class="otb-icon">⏳</span>
+      <span class="otb-label">Menunggu<br>Pembayaran</span>
+      <span class="otb-badge" id="badge-pending"></span>
+    </button>
+    <button class="otb" data-status="paid" onclick="switchTab(this)">
+      <span class="otb-icon">✅</span>
+      <span class="otb-label">Pembayaran<br>Diterima</span>
+      <span class="otb-badge" id="badge-paid"></span>
+    </button>
+    <button class="otb" data-status="processing" onclick="switchTab(this)">
+      <span class="otb-icon">⚙️</span>
+      <span class="otb-label">Sedang<br>Diproses</span>
+      <span class="otb-badge" id="badge-processing"></span>
+    </button>
+    <button class="otb" data-status="shipped" onclick="switchTab(this)">
+      <span class="otb-icon">🚚</span>
+      <span class="otb-label">Dalam<br>Pengiriman</span>
+      <span class="otb-badge" id="badge-shipped"></span>
+    </button>
+    <button class="otb" data-status="delivered" onclick="switchTab(this)">
+      <span class="otb-icon">📦</span>
+      <span class="otb-label">Pesanan<br>Tiba</span>
+      <span class="otb-badge" id="badge-delivered"></span>
+    </button>
+    <button class="otb" data-status="cancelled" onclick="switchTab(this)">
+      <span class="otb-icon">❌</span>
+      <span class="otb-label">Dibatalkan</span>
+      <span class="otb-badge" id="badge-cancelled"></span>
+    </button>
+  </div>
+</div>
+
+<div class="orders-page-wrap">
+
+  <!-- SEARCH BAR -->
+  <div class="orders-search-bar">
+    <input type="text" id="order-query" placeholder="🔍 Cari nomor pesanan, email, atau nama..."
+      oninput="renderOrders()" onkeydown="if(event.key==='Enter')renderOrders()">
+  </div>
+
+  <!-- DAFTAR PESANAN -->
+  <div id="orders-list"></div>
+
+  <!-- EMPTY STATE -->
+  <div id="orders-empty" class="orders-empty-state" style="display:none">
+    <div class="oes-icon" id="oes-icon">📭</div>
+    <div class="oes-title" id="oes-title">Belum ada pesanan</div>
+    <div class="oes-desc" id="oes-desc">Yuk mulai belanja di BOSNIALine!</div>
+    <a href="index.html" class="oes-btn">Mulai Belanja →</a>
+  </div>
+
+</div>
+
+<!-- MODAL DETAIL PESANAN -->
+<div class="modal-overlay" id="order-modal" onclick="if(event.target===this)closeOrderModal()">
+  <div class="order-modal-box" onclick="event.stopPropagation()">
+    <div class="order-modal-header">
+      <h3>Detail Pesanan</h3>
+      <button onclick="closeOrderModal()">✕</button>
+    </div>
+    <div id="order-modal-content"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script src="auth.js"></script>
+<script src="cart.js"></script>
+<script>
+// ============================================================
+// CONFIG STATUS
+// ============================================================
+const STATUS_CFG = {
+  pending:    { label: "Menunggu Pembayaran", color: "#ff6f00", bg: "#fff8e1", icon: "⏳",
+                desc: "Silakan selesaikan pembayaran sesuai metode yang dipilih.",
+                emptyIcon: "⏳", emptyTitle: "Tidak ada pesanan menunggu pembayaran" },
+  paid:       { label: "Pembayaran Diterima",  color: "#1565c0", bg: "#e3f2fd", icon: "✅",
+                desc: "Pembayaran kamu sudah kami terima. Pesanan sedang disiapkan.",
+                emptyIcon: "✅", emptyTitle: "Tidak ada pesanan yang sudah dibayar" },
+  processing: { label: "Sedang Diproses",      color: "#6a1b9a", bg: "#f3e5f5", icon: "⚙️",
+                desc: "Pesanan sedang dikemas dan disiapkan untuk pengiriman.",
+                emptyIcon: "⚙️", emptyTitle: "Tidak ada pesanan yang sedang diproses" },
+  shipped:    { label: "Dalam Pengiriman",     color: "#00838f", bg: "#e0f7fa", icon: "🚚",
+                desc: "Paket sudah diserahkan ke kurir dan dalam perjalanan.",
+                emptyIcon: "🚚", emptyTitle: "Tidak ada pesanan dalam pengiriman" },
+  delivered:  { label: "Pesanan Tiba",         color: "#2e7d32", bg: "#e8f5e9", icon: "📦",
+                desc: "Paket sudah tiba. Terima kasih sudah berbelanja di BOSNIALine!",
+                emptyIcon: "📦", emptyTitle: "Belum ada pesanan yang tiba" },
+  cancelled:  { label: "Dibatalkan",           color: "#c62828", bg: "#ffebee", icon: "❌",
+                desc: "Pesanan ini telah dibatalkan.",
+                emptyIcon: "❌", emptyTitle: "Tidak ada pesanan yang dibatalkan" }
+};
+const STATUS_FLOW = ["pending","paid","processing","shipped","delivered"];
+
+let currentTab = "all";
+
+// ============================================================
+// SUMBER DATA PESANAN — ambil dari localStorage (shared dgn admin)
+// ============================================================
+function getOrders() {
+  const raw = JSON.parse(localStorage.getItem("bosnialine_orders") || "[]");
+  // Normalisasi field agar konsisten dari checkout.js maupun format lama
+  return raw.map(o => ({
+    ...o,
+    id:     o.id || o.orderId || "",
+    orderId: o.orderId || o.id || "",
+    date:   o.date || (o.createdAt ? new Date(o.createdAt).toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"}) : "-"),
+    status: o.status || "pending",
+    payment: o.payment || o.paymentLabel || "-",
+    paymentLabel: o.paymentLabel || o.payment || "-",
+    customer: {
+      name:     o.customer?.name     || o.customer?.nama   || "-",
+      phone:    o.customer?.phone    || o.customer?.telepon || "-",
+      email:    o.customer?.email    || "-",
+      address:  o.customer?.address  || o.customer?.addr   || o.customer?.alamat || "-",
+      city:     o.customer?.city     || o.customer?.kota   || "-",
+      province: o.customer?.province || o.customer?.prov   || o.customer?.provinsi || "-",
+      zip:      o.customer?.zip      || o.customer?.kodePos || "-",
+      note:     o.customer?.note     || ""
+    },
+    shipping: {
+      label: o.shipping?.label || "-",
+      eta:   o.shipping?.eta   || "-",
+      cost:  o.shipping?.cost  ?? 0
+    },
+    items: Array.isArray(o.items) ? o.items : [],
+    subtotal: o.subtotal || 0,
+    discount: o.discount || 0,
+    total:    o.total    || 0
+  }));
+}
+
+function saveOrders(orders) {
+  localStorage.setItem("bosnialine_orders", JSON.stringify(orders));
+}
+
+// ============================================================
+// UPDATE BADGE COUNT
+// ============================================================
+function updateBadges() {
+  const orders = getOrders();
+  const total = orders.length;
+  const el = document.getElementById("badge-all");
+  if (el) { el.textContent = total > 0 ? total : ""; el.style.display = total > 0 ? "flex" : "none"; }
+  Object.keys(STATUS_CFG).forEach(s => {
+    const cnt = orders.filter(o => o.status === s).length;
+    const b = document.getElementById("badge-" + s);
+    if (b) { b.textContent = cnt > 0 ? cnt : ""; b.style.display = cnt > 0 ? "flex" : "none"; }
+  });
+}
+
+// ============================================================
+// SWITCH TAB
+// ============================================================
+function switchTab(btn) {
+  document.querySelectorAll(".otb").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  currentTab = btn.dataset.status;
+  document.getElementById("order-query").value = "";
+  renderOrders();
+}
+
+// ============================================================
+// RENDER DAFTAR PESANAN
+// ============================================================
+function renderOrders() {
+  const orders = getOrders();
+  const q = (document.getElementById("order-query")?.value || "").trim().toLowerCase();
+
+  let filtered = currentTab === "all" ? [...orders]
+    : orders.filter(o => o.status === currentTab);
+
+  if (q) {
+    filtered = filtered.filter(o =>
+      o.id.toLowerCase().includes(q) ||
+      (o.customer?.name || "").toLowerCase().includes(q) ||
+      (o.customer?.email || "").toLowerCase().includes(q) ||
+      (o.customer?.phone || "").includes(q)
+    );
+  }
+
+  const list = document.getElementById("orders-list");
+  const empty = document.getElementById("orders-empty");
+
+  if (!filtered.length) {
+    list.innerHTML = "";
+    empty.style.display = "flex";
+    const cfg = currentTab !== "all" ? STATUS_CFG[currentTab] : null;
+    document.getElementById("oes-icon").textContent = cfg ? cfg.emptyIcon : "📭";
+    document.getElementById("oes-title").textContent = cfg ? cfg.emptyTitle : (orders.length ? "Pesanan tidak ditemukan" : "Belum ada pesanan");
+    document.getElementById("oes-desc").textContent = orders.length && q ? "Coba kata kunci lain" : "Yuk mulai belanja di BOSNIALine!";
+    return;
+  }
+  empty.style.display = "none";
+  list.innerHTML = filtered.map(buildOrderCard).join("");
+}
+
+// ============================================================
+// BUILD KARTU PESANAN
+// ============================================================
+function buildOrderCard(o) {
+  // Normalisasi status: "confirmed" → "paid", apapun yang tidak dikenal → "pending"
+  const STATUS_ALIAS = { confirmed: "paid", pending_payment: "pending", done: "delivered", complete: "delivered" };
+  const safeStatus = STATUS_ALIAS[o.status] || (STATUS_CFG[o.status] ? o.status : "pending");
+  const s = STATUS_CFG[safeStatus];
+  const currentIdx = STATUS_FLOW.indexOf(safeStatus);
+  const isCancelled = safeStatus === "cancelled";
+  const itemCount = (o.items || []).reduce((sum, i) => sum + (i.qty || 1), 0);
+
+  // Progress steps
+  const progressHTML = !isCancelled ? `
+    <div class="oc-progress">
+      ${STATUS_FLOW.map((step, i) => {
+        const sc = STATUS_CFG[step];
+        const done = i <= currentIdx;
+        const active = i === currentIdx;
+        return `
+          <div class="ocp-step ${done ? 'done' : ''} ${active ? 'active' : ''}">
+            <div class="ocp-dot">${done ? sc.icon : ''}</div>
+            <div class="ocp-label">${sc.label}</div>
+            ${i < STATUS_FLOW.length - 1 ? `<div class="ocp-line ${i < currentIdx ? 'filled' : ''}"></div>` : ''}
+          </div>`;
+      }).join("")}
+    </div>` : `
+    <div class="oc-cancelled-bar">
+      <span>❌</span> Pesanan ini telah dibatalkan
+    </div>`;
+
+  // Action button berdasarkan status
+  let actionBtn = "";
+  if (safeStatus === "pending") {
+    actionBtn = `<button class="oc-action-btn pay-btn" onclick="event.stopPropagation();showPaymentInfo('${o.id}')">💳 Bayar Sekarang</button>`;
+  } else if (safeStatus === "shipped") {
+    actionBtn = `<button class="oc-action-btn confirm-btn" onclick="event.stopPropagation();confirmReceived('${o.id}')">📦 Konfirmasi Pesanan Tiba</button>`;
+  } else if (safeStatus === "delivered") {
+    actionBtn = `<button class="oc-action-btn review-btn" onclick="event.stopPropagation();showToast('Fitur ulasan segera hadir!')">⭐ Beri Ulasan</button>`;
+  }
+
+  return `
+    <div class="order-card-new" onclick="showOrderDetail('${o.id}')">
+
+      <!-- HEADER -->
+      <div class="oc-header">
+        <div class="oc-header-left">
+          <span class="oc-id">${o.id}</span>
+          <span class="oc-date">${o.date}</span>
+        </div>
+        <span class="oc-status-pill" style="background:${s.bg};color:${s.color};border:1.5px solid ${s.color}40">
+          ${s.icon} ${s.label}
+        </span>
+      </div>
+
+      <!-- PROGRESS -->
+      ${progressHTML}
+
+      <!-- ITEMS -->
+      <div class="oc-items">
+        ${o.items.slice(0, 3).map(i => `
+          <div class="oc-item">
+            <img src="${i.image || ''}" alt="${i.name}"
+              onerror="this.onerror=null;this.src='https://placehold.co/64x56/f5f5f5/bdbdbd?text=No+Img'">
+            <div class="oc-item-info">
+              <div class="oc-item-name">${i.name}</div>
+              <div class="oc-item-meta">x${i.qty} · ${formatPrice(i.price)}</div>
+            </div>
+            <div style="font-size:13px;font-weight:700;color:var(--primary,#e53935);white-space:nowrap">${formatPrice(i.price * i.qty)}</div>
+          </div>`).join("")}
+        ${o.items.length > 3 ? `<div class="oc-more-items">+${o.items.length - 3} produk lainnya</div>` : ""}
+      </div>
+
+      <!-- FOOTER -->
+      <div class="oc-footer">
+        <div class="oc-footer-left">
+          <span class="oc-total-label">${itemCount} produk · Total Pesanan</span>
+          <span class="oc-total-price">${formatPrice(o.total)}</span>
+        </div>
+        <div class="oc-footer-right">
+          ${actionBtn}
+          <button class="oc-detail-btn" onclick="event.stopPropagation();showOrderDetail('${o.id}')">Lihat Detail</button>
+        </div>
+      </div>
+
+    </div>`;
+}
+
+// ============================================================
+// MODAL DETAIL
+// ============================================================
+function showOrderDetail(id) {
+  const orders = getOrders();
+  const o = orders.find(x => x.id === id);
+  if (!o) return;
+
+  const STATUS_ALIAS = { confirmed: "paid", pending_payment: "pending", done: "delivered", complete: "delivered" };
+  const safeStatus = STATUS_ALIAS[o.status] || (STATUS_CFG[o.status] ? o.status : "pending");
+  const currentIdx = STATUS_FLOW.indexOf(safeStatus);
+  const isCancelled = safeStatus === "cancelled";
+  const s = STATUS_CFG[safeStatus];
+
+  const timeline = STATUS_FLOW.map((step, i) => {
+    const sc = STATUS_CFG[step];
+    const done = i <= currentIdx && !isCancelled;
+    const active = i === currentIdx && !isCancelled;
+    return `
+      <div class="tl-step ${done ? 'done' : ''} ${active ? 'active' : ''}">
+        <div class="tl-icon-wrap">
+          <div class="tl-icon">${done || active ? sc.icon : '○'}</div>
+          ${i < STATUS_FLOW.length - 1 ? `<div class="tl-connector ${done && i < currentIdx ? 'filled' : ''}"></div>` : ''}
+        </div>
+        <div class="tl-info">
+          <div class="tl-label">${sc.label}</div>
+          ${active ? `<div class="tl-desc">${sc.desc}</div>` : ''}
+        </div>
+      </div>`;
+  }).join("");
+
+  const banner = `
+    <div class="order-status-banner" style="background:${s.bg};border-left:4px solid ${s.color}">
+      <div class="osb-icon">${s.icon}</div>
+      <div>
+        <div class="osb-label" style="color:${s.color}">${s.label}</div>
+        <div class="osb-desc">${s.desc}</div>
+      </div>
+    </div>`;
+
+  let modalAction = "";
+  if (safeStatus === "pending") {
+    modalAction = `<div style="padding:0 20px 16px"><button class="oc-action-btn pay-btn" style="width:100%;padding:13px;font-size:14px" onclick="closeOrderModal();showPaymentInfo('${o.id}')">💳 Bayar Sekarang</button></div>`;
+  } else if (safeStatus === "shipped") {
+    modalAction = `<div style="padding:0 20px 16px"><button class="oc-action-btn confirm-btn" style="width:100%;padding:13px;font-size:14px" onclick="closeOrderModal();confirmReceived('${o.id}')">📦 Konfirmasi Pesanan Tiba</button></div>`;
+  }
+
+  // Format alamat lengkap
+  const addrFull = [o.customer.address, o.customer.city, o.customer.province, o.customer.zip]
+    .filter(v => v && v !== "-").join(", ");
+
+  document.getElementById("order-modal-content").innerHTML = `
+    <div class="order-detail-id" style="padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span style="font-family:monospace;font-size:15px;font-weight:800">${o.id}</span>
+      <span style="font-size:11px;color:#9e9e9e">${o.date}</span>
+    </div>
+
+    <div style="padding:12px 20px 0">${banner}</div>
+
+    <div class="order-timeline-full" style="margin:12px 20px">
+      <div class="tl-title">📍 Status Pesanan</div>
+      <div class="tl-track">${timeline}</div>
+    </div>
+
+    ${modalAction}
+
+    <div class="order-detail-section" style="padding:14px 20px;border-top:1px solid #f0f0f0;border-bottom:1px solid #f0f0f0">
+      <h4 style="font-size:13px;font-weight:700;color:#424242;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">📦 Item Pesanan</h4>
+      ${o.items.map(i => `
+        <div class="oc-modal-item">
+          <div class="oc-modal-img-wrap">
+            <img src="${i.image || ''}" alt="${i.name}"
+              onerror="this.onerror=null;this.src='https://placehold.co/72x60/f5f5f5/bdbdbd?text=No+Img'">
+          </div>
+          <div class="oc-modal-item-info">
+            <div class="oc-modal-item-name">${i.name}</div>
+            <div class="oc-modal-item-meta">
+              <span>x${i.qty}</span>
+              <span>${formatPrice(i.price)} / item</span>
+            </div>
+          </div>
+          <div class="oc-modal-item-total">${formatPrice(i.price * i.qty)}</div>
+        </div>`).join("")}
+    </div>
+
+    <div class="order-detail-section" style="padding:14px 20px;border-bottom:1px solid #f0f0f0">
+      <h4 style="font-size:13px;font-weight:700;color:#424242;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">📍 Alamat Pengiriman</h4>
+      <p style="font-size:14px;font-weight:700">${o.customer.name}</p>
+      <p style="font-size:13px;color:#616161;margin-top:2px">${o.customer.phone}</p>
+      <p style="font-size:13px;color:#616161;margin-top:6px">${addrFull || "-"}</p>
+      ${o.customer.note ? `<p style="font-size:12px;color:#9e9e9e;margin-top:6px">📝 ${o.customer.note}</p>` : ""}
+    </div>
+
+    <div class="order-detail-section" style="padding:14px 20px;border-bottom:1px solid #f0f0f0">
+      <h4 style="font-size:13px;font-weight:700;color:#424242;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">🚚 Pengiriman & Pembayaran</h4>
+      <div class="order-info-grid">
+        <div><span class="muted">Kurir</span><span>${o.shipping.label}</span></div>
+        <div><span class="muted">Estimasi</span><span>${o.shipping.eta}</span></div>
+        <div><span class="muted">Ongkir</span><span>${o.shipping.cost === 0 ? "GRATIS" : formatPrice(o.shipping.cost)}</span></div>
+        <div><span class="muted">Pembayaran</span><span style="font-weight:700">${o.paymentLabel || o.payment || "-"}</span></div>
+      </div>
+    </div>
+
+    <div style="padding:14px 20px 20px">
+      <div class="order-price-summary">
+        <div class="order-price-row"><span>Subtotal</span><span>${formatPrice(o.subtotal)}</span></div>
+        <div class="order-price-row"><span>Ongkos Kirim</span><span>${o.shipping.cost === 0 ? "GRATIS" : formatPrice(o.shipping.cost)}</span></div>
+        ${o.discount > 0 ? `<div class="order-price-row" style="color:#2e7d32"><span>Diskon</span><span>- ${formatPrice(o.discount)}</span></div>` : ""}
+        <div class="order-price-row total"><span>Total Bayar</span><span>${formatPrice(o.total)}</span></div>
+      </div>
+    </div>`;
+
+  document.getElementById("order-modal").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeOrderModal() {
+  document.getElementById("order-modal").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+// ============================================================
+// AKSI PEMBELI
+// ============================================================
+// AKSI PEMBELI
+// ============================================================
+async function showPaymentInfo(id) {
+  const orders = await getOrders();
+  const o = orders.find(x => x.id === id);
+  if (!o) return;
+
+  const deadline = new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleString("id-ID", {
+    day: "numeric", month: "long", year: "numeric",
+    hour: "2-digit", minute: "2-digit"
+  });
+
+  // Tentukan info pembayaran berdasarkan metode
+  const payMethod = (o.payment || "").toLowerCase();
+  let payHTML = "";
+
+  if (payMethod === "dana") {
+    payHTML = `
+      <div class="pay-modal-method" style="background:#e3f2fd;border:2px solid #118eea">
+        <div class="pmm-logo">💙 DANA</div>
+        <div class="pmm-label">Nomor DANA Tujuan</div>
+        <div class="pmm-number">0857-1644-4966</div>
+        <div class="pmm-name">BOSNIALine Official</div>
+        <button class="pmm-copy-btn" onclick="copyPayNum('0857-1644-4966', this)">📋 Salin Nomor</button>
+      </div>`;
+  } else if (payMethod === "gopay") {
+    payHTML = `
+      <div class="pay-modal-method" style="background:#e0f7fa;border:2px solid #00aed6">
+        <div class="pmm-logo">💚 GoPay</div>
+        <div class="pmm-label">Nomor GoPay Tujuan</div>
+        <div class="pmm-number">0857-1644-4966</div>
+        <div class="pmm-name">BOSNIALine Official</div>
+        <button class="pmm-copy-btn" onclick="copyPayNum('0857-1644-4966', this)">📋 Salin Nomor</button>
+      </div>`;
+  } else if (payMethod === "ovo") {
+    payHTML = `
+      <div class="pay-modal-method" style="background:#f3e5f5;border:2px solid #4c3494">
+        <div class="pmm-logo">💜 OVO</div>
+        <div class="pmm-label">Nomor OVO Tujuan</div>
+        <div class="pmm-number">0857-1644-4966</div>
+        <div class="pmm-name">BOSNIALine Official</div>
+        <button class="pmm-copy-btn" onclick="copyPayNum('0857-1644-4966', this)">📋 Salin Nomor</button>
+      </div>`;
+  } else if (payMethod === "bca") {
+    payHTML = `
+      <div class="pay-modal-method" style="background:#e3f2fd;border:2px solid #005baa">
+        <div class="pmm-logo">🏦 BCA Virtual Account</div>
+        <div class="pmm-label">Nomor Virtual Account</div>
+        <div class="pmm-number">8277${o.id.replace("BL-","")}01</div>
+        <button class="pmm-copy-btn" onclick="copyPayNum('8277${o.id.replace("BL-","")}01', this)">📋 Salin Nomor VA</button>
+      </div>`;
+  } else if (payMethod === "bni") {
+    payHTML = `
+      <div class="pay-modal-method" style="background:#fff3e0;border:2px solid #f26522">
+        <div class="pmm-logo">🏦 BNI Virtual Account</div>
+        <div class="pmm-label">Nomor Virtual Account</div>
+        <div class="pmm-number">8888${o.id.replace("BL-","")}02</div>
+        <button class="pmm-copy-btn" onclick="copyPayNum('8888${o.id.replace("BL-","")}02', this)">📋 Salin Nomor VA</button>
+      </div>`;
+  } else if (payMethod === "mandiri") {
+    payHTML = `
+      <div class="pay-modal-method" style="background:#e3f2fd;border:2px solid #003d79">
+        <div class="pmm-logo">🏦 Mandiri Virtual Account</div>
+        <div class="pmm-label">Nomor Virtual Account</div>
+        <div class="pmm-number">70012${o.id.replace("BL-","")}03</div>
+        <button class="pmm-copy-btn" onclick="copyPayNum('70012${o.id.replace("BL-","")}03', this)">📋 Salin Nomor VA</button>
+      </div>`;
+  } else if (payMethod === "qris") {
+    payHTML = `
+      <div class="pay-modal-method" style="background:#ffebee;border:2px solid #e53935">
+        <div class="pmm-logo">📱 QRIS</div>
+        <div class="pmm-label">Scan QR Code di bawah</div>
+        <div style="margin:12px auto;padding:12px;background:white;border-radius:10px;display:inline-block">
+          <svg viewBox="0 0 100 100" width="120" height="120">
+            <rect x="5" y="5" width="35" height="35" fill="none" stroke="#000" stroke-width="4"/>
+            <rect x="12" y="12" width="21" height="21" fill="#000"/>
+            <rect x="60" y="5" width="35" height="35" fill="none" stroke="#000" stroke-width="4"/>
+            <rect x="67" y="12" width="21" height="21" fill="#000"/>
+            <rect x="5" y="60" width="35" height="35" fill="none" stroke="#000" stroke-width="4"/>
+            <rect x="12" y="67" width="21" height="21" fill="#000"/>
+            <rect x="60" y="60" width="10" height="10" fill="#000"/>
+            <rect x="75" y="60" width="10" height="10" fill="#000"/>
+            <rect x="60" y="75" width="10" height="10" fill="#000"/>
+            <rect x="75" y="75" width="10" height="10" fill="#000"/>
+          </svg>
+          <div style="font-size:11px;color:#666;text-align:center;margin-top:4px">QRIS BOSNIALine</div>
+        </div>
+      </div>`;
+  } else if (payMethod === "cod") {
+    payHTML = `
+      <div class="pay-modal-method" style="background:#e8f5e9;border:2px solid #2e7d32">
+        <div class="pmm-logo">💵 COD — Bayar di Tempat</div>
+        <div class="pmm-label" style="margin-top:8px">Siapkan uang tunai saat kurir tiba</div>
+      </div>`;
+  } else {
+    payHTML = `
+      <div class="pay-modal-method" style="background:#f5f5f5;border:2px solid #bdbdbd">
+        <div class="pmm-logo">💳 ${payMethod.toUpperCase()}</div>
+        <div class="pmm-label">Selesaikan pembayaran sesuai metode yang dipilih</div>
+      </div>`;
+  }
+
+  // Inject modal jika belum ada
+  let modal = document.getElementById("pay-info-modal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "pay-info-modal";
+    modal.className = "modal-overlay";
+    modal.style.zIndex = "10000";
+    modal.innerHTML = `
+      <div class="pay-info-box" onclick="event.stopPropagation()">
+        <div class="pay-info-header">
+          <h3>💳 Informasi Pembayaran</h3>
+          <button onclick="closePayModal()">✕</button>
+        </div>
+        <div id="pay-info-body"></div>
+      </div>`;
+    modal.addEventListener("click", e => { if (e.target === modal) closePayModal(); });
+    document.body.appendChild(modal);
+  }
+
+  document.getElementById("pay-info-body").innerHTML = `
+    <div class="pay-info-content">
+
+      <!-- ORDER ID -->
+      <div class="pay-order-id">
+        <span>No. Pesanan</span>
+        <strong>${o.id}</strong>
+      </div>
+
+      <!-- METODE & NOMOR -->
+      ${payHTML}
+
+      <!-- JUMLAH BAYAR -->
+      <div class="pay-amount-box">
+        <div class="pab-label">Total yang Harus Dibayar</div>
+        <div class="pab-amount">${formatPrice(o.total)}</div>
+        <button class="pmm-copy-btn" style="margin-top:8px" onclick="copyPayNum('${o.total}', this)">📋 Salin Jumlah</button>
+        <div class="pab-note">⚠️ Transfer tepat sesuai jumlah di atas agar pembayaran terverifikasi otomatis</div>
+      </div>
+
+      <!-- BATAS WAKTU -->
+      <div class="pay-deadline-box">
+        ⏰ Batas pembayaran: <strong>${deadline}</strong>
+      </div>
+
+      <!-- TOMBOL KONFIRMASI -->
+      <button class="pay-confirm-btn" onclick="markAsPaid('${o.id}')">
+        ✅ Saya Sudah Melakukan Pembayaran
+      </button>
+      <p class="pay-confirm-note">Klik setelah transfer selesai. Verifikasi oleh tim kami dalam 1×24 jam.</p>
+    </div>`;
+
+  modal.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closePayModal() {
+  const modal = document.getElementById("pay-info-modal");
+  if (modal) { modal.classList.remove("open"); document.body.style.overflow = ""; }
+}
+
+function copyPayNum(text, btn) {
+  navigator.clipboard.writeText(String(text)).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = "✅ Tersalin!";
+    btn.style.background = "#2e7d32";
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ""; }, 2000);
+  });
+}
+
+function markAsPaid(id) {
+  const raw = JSON.parse(localStorage.getItem("bosnialine_orders") || "[]");
+  const idx = raw.findIndex(o => (o.id || o.orderId) === id);
+  if (idx !== -1) {
+    const payMethod = raw[idx].payment || "";
+    if (payMethod !== "cod") {
+      raw[idx].status = "paid";
+      localStorage.setItem("bosnialine_orders", JSON.stringify(raw));
+    }
+  }
+  closePayModal();
+  updateBadges();
+  renderOrders();
+  showToast("✅ Konfirmasi pembayaran dikirim! Pesanan sedang diverifikasi.");
+}
+
+function confirmReceived(id) {
+  if (!confirm("Konfirmasi pesanan sudah diterima?")) return;
+  const raw = JSON.parse(localStorage.getItem("bosnialine_orders") || "[]");
+  const idx = raw.findIndex(o => (o.id || o.orderId) === id);
+  if (idx === -1) return;
+  raw[idx].status = "delivered";
+  localStorage.setItem("bosnialine_orders", JSON.stringify(raw));
+  updateBadges();
+  renderOrders();
+  showToast("📦 Pesanan dikonfirmasi tiba! Terima kasih sudah berbelanja.");
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener("DOMContentLoaded", () => {
+  updateBadges();
+  renderOrders();
+  // Auto-refresh setiap 10 detik agar status dari admin langsung terlihat
+  setInterval(() => {
+    updateBadges();
+    renderOrders();
+  }, 10000);
+});
+</script>
+</body>
+</html>

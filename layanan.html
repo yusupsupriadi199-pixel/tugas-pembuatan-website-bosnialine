@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Layanan - BOSNIALine</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="cart.css">
+  <link rel="stylesheet" href="i18n.css">
+  <link rel="stylesheet" href="layanan.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="index.html" class="logo">💻 TOKO KOMPUTER BOSNIA<span>Line</span></a>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Cari produk..."/>
+      <button onclick="window.location.href='search.html?q='+document.getElementById('search-input').value">🔍</button>
+    </div>
+    <div class="nav-actions">
+      <button class="nav-btn cart-trigger" style="position:relative">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge" id="cart-badge" style="display:none">0</span>
+        Keranjang
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="layanan-hero">
+  <div class="layanan-hero-inner">
+    <h1>Layanan BOSNIALine</h1>
+    <p>Belanja tenang, kami jamin kepuasan kamu dari awal sampai akhir</p>
+  </div>
+</div>
+
+<!-- TAB NAV -->
+<div class="layanan-tabs-wrap">
+  <div class="layanan-tabs">
+    <button class="ltab active" onclick="showLayanan('ongkir')" id="tab-ongkir">🚚 Gratis Ongkir</button>
+    <button class="ltab" onclick="showLayanan('garansi')" id="tab-garansi">🛡️ Garansi Resmi</button>
+    <button class="ltab" onclick="showLayanan('retur')" id="tab-retur">↩️ Retur 7 Hari</button>
+    <button class="ltab" onclick="showLayanan('cicilan')" id="tab-cicilan">💳 Cicilan 0%</button>
+  </div>
+</div>
+
+<div class="container layanan-container">
+
+  <!-- GRATIS ONGKIR -->
+  <div class="layanan-content" id="lay-ongkir">
+    <div class="lay-header">
+      <div class="lay-icon">🚚</div>
+      <div>
+        <h2>Gratis Ongkos Kirim</h2>
+        <p>Hemat lebih banyak, belanja lebih nyaman</p>
+      </div>
+    </div>
+
+    <div class="lay-highlight-box green">
+      Gratis ongkir untuk setiap pembelian di atas <strong>Rp 500.000</strong> ke seluruh Indonesia
+    </div>
+
+    <div class="lay-cards">
+      <div class="lay-card">
+        <div class="lay-card-icon">📦</div>
+        <h4>Syarat Gratis Ongkir</h4>
+        <ul>
+          <li>Minimum pembelian Rp 500.000</li>
+          <li>Berlaku untuk semua kategori produk</li>
+          <li>Berlaku ke seluruh wilayah Indonesia</li>
+          <li>Tidak berlaku untuk produk pre-order</li>
+        </ul>
+      </div>
+      <div class="lay-card">
+        <div class="lay-card-icon">🗺️</div>
+        <h4>Jangkauan Pengiriman</h4>
+        <ul>
+          <li>Seluruh Pulau Jawa & Bali</li>
+          <li>Sumatera, Kalimantan, Sulawesi</li>
+          <li>Papua & Indonesia Timur</li>
+          <li>Estimasi 1–7 hari kerja</li>
+        </ul>
+      </div>
+      <div class="lay-card">
+        <div class="lay-card-icon">🤝</div>
+        <h4>Mitra Ekspedisi</h4>
+        <ul>
+          <li>JNE Reguler & YES</li>
+          <li>SiCepat Reguler & BEST</li>
+          <li>GoSend Same Day (Jabodetabek)</li>
+          <li>J&T Express</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="lay-steps">
+      <h3>Cara Mendapatkan Gratis Ongkir</h3>
+      <div class="steps-row">
+        <div class="step-item"><div class="step-num">1</div><p>Tambahkan produk ke keranjang hingga total ≥ Rp 500.000</p></div>
+        <div class="step-arrow">→</div>
+        <div class="step-item"><div class="step-num">2</div><p>Pilih metode pengiriman di halaman checkout</p></div>
+        <div class="step-arrow">→</div>
+        <div class="step-item"><div class="step-num">3</div><p>Ongkos kirim otomatis menjadi Rp 0</p></div>
+        <div class="step-arrow">→</div>
+        <div class="step-item"><div class="step-num">4</div><p>Selesaikan pembayaran dan pesanan dikirim!</p></div>
+      </div>
+    </div>
+
+    <div class="lay-cta">
+      <a href="search.html" class="btn-lay-primary">Belanja Sekarang →</a>
+    </div>
+  </div>
+
+  <!-- GARANSI RESMI -->
+  <div class="layanan-content" id="lay-garansi" style="display:none">
+    <div class="lay-header">
+      <div class="lay-icon">🛡️</div>
+      <div>
+        <h2>Garansi Resmi</h2>
+        <p>Semua produk 100% original dengan garansi resmi distributor</p>
+      </div>
+    </div>
+
+    <div class="lay-highlight-box blue">
+      Setiap produk yang dijual BOSNIALine dilengkapi <strong>garansi resmi</strong> dari distributor atau produsen terpercaya
+    </div>
+
+    <div class="lay-cards">
+      <div class="lay-card">
+        <div class="lay-card-icon">💻</div>
+        <h4>Laptop & Komputer</h4>
+        <ul>
+          <li>Garansi resmi 1–2 tahun</li>
+          <li>Klaim di service center resmi</li>
+          <li>Mencakup kerusakan pabrik</li>
+          <li>Suku cadang original</li>
+        </ul>
+      </div>
+      <div class="lay-card">
+        <div class="lay-card-icon">🖥️</div>
+        <h4>Monitor & Aksesoris</h4>
+        <ul>
+          <li>Garansi resmi 1 tahun</li>
+          <li>Dead pixel policy berlaku</li>
+          <li>Penggantian unit jika cacat pabrik</li>
+          <li>Klaim mudah via CS BOSNIALine</li>
+        </ul>
+      </div>
+      <div class="lay-card">
+        <div class="lay-card-icon">📋</div>
+        <h4>Cara Klaim Garansi</h4>
+        <ul>
+          <li>Simpan nota & kartu garansi</li>
+          <li>Hubungi CS BOSNIALine</li>
+          <li>Kirim produk ke service center</li>
+          <li>Proses 3–14 hari kerja</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="lay-faq">
+      <h3>FAQ Garansi</h3>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">Apa yang ditanggung garansi resmi? <span>+</span></button>
+          <div class="faq-a">Garansi resmi menanggung kerusakan akibat cacat produksi, komponen yang tidak berfungsi normal, dan masalah teknis yang bukan disebabkan oleh pengguna.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">Apa yang TIDAK ditanggung garansi? <span>+</span></button>
+          <div class="faq-a">Kerusakan fisik akibat jatuh/benturan, kemasukan air/cairan, modifikasi oleh pihak ketiga, dan kerusakan akibat penggunaan tidak sesuai petunjuk tidak ditanggung garansi.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">Bagaimana cara mengklaim garansi? <span>+</span></button>
+          <div class="faq-a">Hubungi CS BOSNIALine via WhatsApp 0857-1644-4966 atau email cs@bosnialine.id dengan menyertakan foto produk, nomor pesanan, dan deskripsi kerusakan. Tim kami akan memandu proses selanjutnya.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">Berapa lama proses klaim garansi? <span>+</span></button>
+          <div class="faq-a">Proses klaim garansi membutuhkan waktu 3–14 hari kerja tergantung jenis kerusakan dan ketersediaan suku cadang. Kami akan memberikan update berkala via WhatsApp.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lay-cta">
+      <a href="search.html" class="btn-lay-primary">Belanja Produk Bergaransi →</a>
+      <a href="https://wa.me/6285716444966?text=Halo%20BOSNIALine%2C%20saya%20ingin%20mengklaim%20garansi%20produk" target="_blank" class="btn-lay-secondary">💬 Hubungi CS</a>
+    </div>
+  </div>
+
+  <!-- RETUR 7 HARI -->
+  <div class="layanan-content" id="lay-retur" style="display:none">
+    <div class="lay-header">
+      <div class="lay-icon">↩️</div>
+      <div>
+        <h2>Retur 7 Hari</h2>
+        <p>Tidak puas? Kembalikan dalam 7 hari, kami proses tanpa ribet</p>
+      </div>
+    </div>
+
+    <div class="lay-highlight-box orange">
+      Kembalikan produk dalam <strong>7 hari</strong> setelah diterima jika tidak sesuai deskripsi atau terdapat cacat
+    </div>
+
+    <div class="lay-cards">
+      <div class="lay-card">
+        <div class="lay-card-icon">✅</div>
+        <h4>Alasan Retur Diterima</h4>
+        <ul>
+          <li>Produk tidak sesuai deskripsi</li>
+          <li>Produk cacat / rusak saat diterima</li>
+          <li>Produk salah kirim</li>
+          <li>Produk tidak lengkap aksesorinya</li>
+        </ul>
+      </div>
+      <div class="lay-card">
+        <div class="lay-card-icon">❌</div>
+        <h4>Alasan Retur Tidak Diterima</h4>
+        <ul>
+          <li>Produk sudah digunakan > 7 hari</li>
+          <li>Kemasan/segel sudah dibuka tanpa alasan</li>
+          <li>Kerusakan akibat kesalahan pengguna</li>
+          <li>Produk software / lisensi digital</li>
+        </ul>
+      </div>
+      <div class="lay-card">
+        <div class="lay-card-icon">🔄</div>
+        <h4>Opsi Penyelesaian</h4>
+        <ul>
+          <li>Penggantian unit baru</li>
+          <li>Refund penuh ke rekening</li>
+          <li>Kredit toko (store credit)</li>
+          <li>Perbaikan gratis oleh teknisi</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- FORM PENGAJUAN RETUR -->
+    <div class="retur-form-section">
+      <h3>📝 Ajukan Retur Online</h3>
+      <p>Isi form di bawah, tim kami akan menghubungi kamu dalam 1×24 jam</p>
+      <form class="retur-form" onsubmit="submitRetur(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nomor Pesanan *</label>
+            <input type="text" id="r-order-id" placeholder="BL-12345678" required>
+          </div>
+          <div class="form-group">
+            <label>Nama Pemesan *</label>
+            <input type="text" id="r-name" placeholder="Nama lengkap" required>
+          </div>
+          <div class="form-group">
+            <label>No. WhatsApp *</label>
+            <input type="tel" id="r-phone" placeholder="08xx-xxxx-xxxx" required>
+          </div>
+          <div class="form-group">
+            <label>Alasan Retur *</label>
+            <select id="r-reason" required>
+              <option value="">-- Pilih Alasan --</option>
+              <option>Produk tidak sesuai deskripsi</option>
+              <option>Produk cacat / rusak saat diterima</option>
+              <option>Produk salah kirim</option>
+              <option>Produk tidak lengkap aksesorinya</option>
+              <option>Lainnya</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group full">
+          <label>Keterangan Detail *</label>
+          <textarea id="r-detail" rows="3" placeholder="Jelaskan kondisi produk dan masalah yang dialami..." required></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Opsi Penyelesaian yang Diinginkan</label>
+          <div class="retur-options">
+            <label class="retur-opt"><input type="radio" name="r-resolution" value="ganti" checked> 🔄 Ganti Unit Baru</label>
+            <label class="retur-opt"><input type="radio" name="r-resolution" value="refund"> 💰 Refund</label>
+            <label class="retur-opt"><input type="radio" name="r-resolution" value="kredit"> 🏷️ Store Credit</label>
+            <label class="retur-opt"><input type="radio" name="r-resolution" value="perbaikan"> 🔧 Perbaikan</label>
+          </div>
+        </div>
+        <button type="submit" class="btn-lay-primary" style="width:100%;padding:14px;font-size:15px">Kirim Pengajuan Retur</button>
+      </form>
+      <div id="retur-success" class="retur-success" style="display:none">
+        <div style="font-size:48px">✅</div>
+        <h3>Pengajuan Retur Diterima!</h3>
+        <p>No. Tiket: <strong id="retur-ticket"></strong></p>
+        <p>Tim kami akan menghubungi kamu via WhatsApp dalam 1×24 jam.</p>
+        <button onclick="resetReturForm()" class="btn-lay-secondary" style="margin-top:16px">Ajukan Retur Lain</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CICILAN 0% -->
+  <div class="layanan-content" id="lay-cicilan" style="display:none">
+    <div class="lay-header">
+      <div class="lay-icon">💳</div>
+      <div>
+        <h2>Cicilan 0%</h2>
+        <p>Bayar ringan setiap bulan, tanpa bunga, tanpa biaya tambahan</p>
+      </div>
+    </div>
+
+    <div class="lay-highlight-box purple">
+      Cicilan <strong>0% bunga</strong> tersedia untuk semua kartu kredit bank partner BOSNIALine
+    </div>
+
+    <div class="lay-cards">
+      <div class="lay-card">
+        <div class="lay-card-icon">🏦</div>
+        <h4>Bank Partner</h4>
+        <ul>
+          <li>BCA — tenor 3, 6, 12, 24 bulan</li>
+          <li>Mandiri — tenor 3, 6, 12 bulan</li>
+          <li>BNI — tenor 3, 6, 12 bulan</li>
+          <li>BRI — tenor 3, 6, 12 bulan</li>
+          <li>CIMB Niaga — tenor 3, 6 bulan</li>
+        </ul>
+      </div>
+      <div class="lay-card">
+        <div class="lay-card-icon">📋</div>
+        <h4>Syarat & Ketentuan</h4>
+        <ul>
+          <li>Minimum transaksi Rp 1.000.000</li>
+          <li>Kartu kredit aktif & limit cukup</li>
+          <li>Berlaku untuk semua produk</li>
+          <li>Proses otomatis saat checkout</li>
+        </ul>
+      </div>
+      <div class="lay-card">
+        <div class="lay-card-icon">🧮</div>
+        <h4>Simulasi Cicilan</h4>
+        <div class="sim-box">
+          <div class="form-group" style="margin-bottom:10px">
+            <label style="font-size:12px">Harga Produk (Rp)</label>
+            <input type="number" id="sim-price" placeholder="8500000" oninput="calcSim()" style="padding:8px;border:1px solid #ddd;border-radius:6px;font-size:13px;width:100%">
+          </div>
+          <div class="form-group" style="margin-bottom:10px">
+            <label style="font-size:12px">Tenor</label>
+            <select id="sim-tenor" onchange="calcSim()" style="padding:8px;border:1px solid #ddd;border-radius:6px;font-size:13px;width:100%">
+              <option value="3">3 Bulan</option>
+              <option value="6">6 Bulan</option>
+              <option value="12" selected>12 Bulan</option>
+              <option value="24">24 Bulan</option>
+            </select>
+          </div>
+          <div id="sim-result" class="sim-result"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lay-steps">
+      <h3>Cara Menggunakan Cicilan 0%</h3>
+      <div class="steps-row">
+        <div class="step-item"><div class="step-num">1</div><p>Pilih produk dan masuk ke halaman checkout</p></div>
+        <div class="step-arrow">→</div>
+        <div class="step-item"><div class="step-num">2</div><p>Di step Pembayaran, pilih "Cicilan 0% Kartu Kredit"</p></div>
+        <div class="step-arrow">→</div>
+        <div class="step-item"><div class="step-num">3</div><p>Pilih bank dan tenor yang diinginkan</p></div>
+        <div class="step-arrow">→</div>
+        <div class="step-item"><div class="step-num">4</div><p>Cicilan otomatis diproses oleh bank</p></div>
+      </div>
+    </div>
+
+    <div class="lay-cta">
+      <a href="search.html" class="btn-lay-primary">Belanja dengan Cicilan →</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-bottom" style="border:none;padding:20px;text-align:center;font-size:12px;color:#bdbdbd;background:#212121">
+    © 2026 BOSNIALine. Semua hak dilindungi. · <a href="index.html" style="color:#bdbdbd">Beranda</a>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script src="auth.js"></script>
+<script src="cart.js"></script>
+<script src="i18n.js"></script>
+<script>
+function showLayanan(name) {
+  ["ongkir","garansi","retur","cicilan"].forEach(n => {
+    document.getElementById("lay-" + n).style.display = n === name ? "block" : "none";
+    document.getElementById("tab-" + n).classList.toggle("active", n === name);
+  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const isOpen = item.classList.contains("open");
+  document.querySelectorAll(".faq-item").forEach(i => i.classList.remove("open"));
+  if (!isOpen) item.classList.add("open");
+}
+
+function submitRetur(e) {
+  e.preventDefault();
+  const ticket = "RT-" + Date.now().toString().slice(-8);
+  const retur = {
+    ticket,
+    orderId: document.getElementById("r-order-id").value,
+    name: document.getElementById("r-name").value,
+    phone: document.getElementById("r-phone").value,
+    reason: document.getElementById("r-reason").value,
+    detail: document.getElementById("r-detail").value,
+    resolution: document.querySelector("input[name='r-resolution']:checked").value,
+    date: new Date().toLocaleString("id-ID"),
+    status: "pending"
+  };
+  const returs = JSON.parse(localStorage.getItem("bosnialine_returs") || "[]");
+  returs.unshift(retur);
+  localStorage.setItem("bosnialine_returs", JSON.stringify(returs));
+
+  document.querySelector(".retur-form").style.display = "none";
+  document.getElementById("retur-ticket").textContent = ticket;
+  document.getElementById("retur-success").style.display = "block";
+}
+
+function resetReturForm() {
+  document.querySelector(".retur-form").reset();
+  document.querySelector(".retur-form").style.display = "grid";
+  document.getElementById("retur-success").style.display = "none";
+}
+
+function calcSim() {
+  const price = parseInt(document.getElementById("sim-price").value) || 0;
+  const tenor = parseInt(document.getElementById("sim-tenor").value);
+  if (!price) { document.getElementById("sim-result").innerHTML = ""; return; }
+  const perBulan = Math.ceil(price / tenor);
+  document.getElementById("sim-result").innerHTML = `
+    <div class="sim-output">
+      <span class="sim-amount">Rp ${perBulan.toLocaleString("id-ID")}</span>
+      <span class="sim-label">/ bulan × ${tenor}</span>
+    </div>
+    <div style="font-size:11px;color:#388e3c;margin-top:4px">Bunga 0% · Total Rp ${price.toLocaleString("id-ID")}</div>`;
+}
+
+// Baca tab dari URL hash
+const hash = location.hash.replace("#","") || "ongkir";
+if (["ongkir","garansi","retur","cicilan"].includes(hash)) showLayanan(hash);
+</script>
+</body>
+</html>

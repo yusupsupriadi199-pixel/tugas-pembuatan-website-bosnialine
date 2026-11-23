@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cari Produk - BOSNIALine</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="cart.css">
+  <link rel="stylesheet" href="i18n.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="index.html" class="logo">💻 BOSNIA<span>Line</span></a>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Cari laptop, komputer, aksesoris..." />
+      <button onclick="applySearch()">🔍</button>
+    </div>
+    <div class="nav-actions">
+      <button class="nav-btn cart-trigger" style="position:relative">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge" id="cart-badge" style="display:none">0</span>
+        <span data-i18n="nav_cart">Keranjang</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="cat-nav">
+  <div class="cat-nav-inner">
+    <a href="search.html?cat=semua" id="nav-semua">Semua</a>
+    <a href="search.html?cat=laptop" id="nav-laptop">Laptop</a>
+    <a href="search.html?cat=komputer" id="nav-komputer">Komputer</a>
+    <a href="search.html?cat=monitor" id="nav-monitor">Monitor</a>
+    <a href="search.html?cat=aksesoris" id="nav-aksesoris">Aksesoris</a>
+  </div>
+</div>
+
+<div class="container">
+  <div class="search-layout">
+
+    <!-- FILTER PANEL -->
+    <aside class="filter-panel">
+      <div class="filter-title">🔧 Filter</div>
+
+      <div class="filter-group">
+        <h4>Kategori</h4>
+        <label><input type="radio" name="cat" value="semua" checked> Semua</label>
+        <label><input type="radio" name="cat" value="laptop"> Laptop</label>
+        <label><input type="radio" name="cat" value="komputer"> Komputer</label>
+        <label><input type="radio" name="cat" value="monitor"> Monitor</label>
+        <label><input type="radio" name="cat" value="aksesoris"> Aksesoris</label>
+        <label><input type="radio" name="cat" value="printer"> Printer</label>
+        <label><input type="radio" name="cat" value="networking"> Networking</label>
+        <label><input type="radio" name="cat" value="storage"> Storage</label>
+      </div>
+
+      <div class="filter-group">
+        <h4>Kondisi</h4>
+        <label><input type="radio" name="kondisi" value="semua" checked> Semua</label>
+        <label><input type="radio" name="kondisi" value="baru"> Baru</label>
+        <label><input type="radio" name="kondisi" value="second"> Second</label>
+      </div>
+
+      <div class="filter-group">
+        <h4>Rentang Harga</h4>
+        <div class="price-inputs">
+          <input type="number" id="price-min" placeholder="Min" />
+          <span>–</span>
+          <input type="number" id="price-max" placeholder="Max" />
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <h4>Rating Minimum</h4>
+        <label><input type="radio" name="rating" value="0" checked> Semua Rating</label>
+        <label><input type="radio" name="rating" value="4.5"> ★ 4.5 ke atas</label>
+        <label><input type="radio" name="rating" value="4"> ★ 4.0 ke atas</label>
+        <label><input type="radio" name="rating" value="3"> ★ 3.0 ke atas</label>
+      </div>
+
+      <div id="filter-active-badge" style="display:none;background:#fff3e0;color:#e65100;font-size:12px;font-weight:700;padding:6px 10px;border-radius:6px;margin-bottom:8px">
+        ⚡ Filter aktif
+      </div>
+      <button class="btn-filter" onclick="applyFilters()">Terapkan Filter</button>
+      <button class="btn-reset" onclick="resetFilters()">Reset</button>
+    </aside>
+
+    <!-- RESULTS -->
+    <div>
+      <div class="search-results-header">
+        <div class="results-count" id="results-count">Menampilkan semua produk</div>
+        <select class="sort-select" id="sort-select" onchange="applyFilters()">
+          <option value="default">Urutkan: Default</option>
+          <option value="price-asc">Harga: Terendah</option>
+          <option value="price-desc">Harga: Tertinggi</option>
+          <option value="rating">Rating Tertinggi</option>
+          <option value="sold">Terlaris</option>
+          <option value="discount">Diskon Terbesar</option>
+        </select>
+      </div>
+      <div class="product-grid" id="results-grid"></div>
+      <div class="no-results" id="no-results" style="display:none">
+        <div class="icon">🔍</div>
+        <p>Produk tidak ditemukan.</p>
+        <p style="font-size:13px;margin-top:8px">Coba kata kunci atau filter lain.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="footer-bottom" style="border:none;padding:20px;text-align:center;font-size:12px;color:#bdbdbd">
+    © 2026 BOSNIALine. Semua hak dilindungi.
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script src="auth.js"></script>
+<script src="cart.js"></script>
+<script src="i18n.js"></script>
+<script>
+const params = new URLSearchParams(window.location.search);
+let currentQuery = params.get("q") || "";
+let currentCat = params.get("cat") || "semua";
+
+// Init search input
+if (currentQuery) document.getElementById("search-input").value = currentQuery;
+
+// Set active cat nav
+const navEl = document.getElementById("nav-" + currentCat);
+if (navEl) navEl.classList.add("active");
+else document.getElementById("nav-semua")?.classList.add("active");
+
+// Set category radio from URL
+document.querySelectorAll("input[name='cat']").forEach(r => {
+  if (r.value === currentCat) r.checked = true;
+});
+
+function applySearch() {
+  currentQuery = document.getElementById("search-input").value.trim();
+  applyFilters();
+}
+
+document.getElementById("search-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") applySearch();
+});
+
+function applyFilters() {
+  const cat      = document.querySelector("input[name='cat']:checked")?.value || "semua";
+  const kondisi  = document.querySelector("input[name='kondisi']:checked")?.value || "semua";
+  const minRating= parseFloat(document.querySelector("input[name='rating']:checked")?.value || 0);
+  const minPrice = parseFloat(document.getElementById("price-min").value) || 0;
+  const maxPrice = parseFloat(document.getElementById("price-max").value) || Infinity;
+  const sort     = document.getElementById("sort-select").value;
+  const q        = document.getElementById("search-input").value.trim().toLowerCase();
+
+  // Show "filter aktif" badge if any non-default filter is set
+  const isFiltered = cat !== "semua" || kondisi !== "semua" || minRating > 0 || minPrice > 0 || maxPrice < Infinity || q;
+  document.getElementById("filter-active-badge").style.display = isFiltered ? "block" : "none";
+
+  let filtered = products.filter(p => {
+    const matchCat     = cat === "semua" || p.category === cat;
+    const matchKondisi = kondisi === "semua"
+      || (kondisi === "second" && p.badge === "Second")
+      || (kondisi === "baru"   && p.badge !== "Second");
+    const matchRating  = p.rating >= minRating;
+    const matchPrice   = p.price >= minPrice && p.price <= maxPrice;
+    const matchQ       = !q || p.name.toLowerCase().includes(q) || (p.specs || "").toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q);
+    return matchCat && matchKondisi && matchRating && matchPrice && matchQ;
+  });
+
+  if (sort === "price-asc")  filtered.sort((a,b) => a.price - b.price);
+  else if (sort === "price-desc") filtered.sort((a,b) => b.price - a.price);
+  else if (sort === "rating")     filtered.sort((a,b) => b.rating - a.rating);
+  else if (sort === "sold")       filtered.sort((a,b) => b.sold - a.sold);
+  else if (sort === "discount")   filtered.sort((a,b) => b.discount - a.discount);
+
+  renderResults(filtered);
+}
+
+function resetFilters() {
+  // Reset semua radio ke default
+  document.querySelectorAll("input[name='cat']")[0].checked   = true;
+  document.querySelectorAll("input[name='kondisi']")[0].checked = true;
+  document.querySelectorAll("input[name='rating']")[0].checked = true;
+  // Reset harga
+  document.getElementById("price-min").value = "";
+  document.getElementById("price-max").value = "";
+  // Reset sort
+  document.getElementById("sort-select").value = "default";
+  // Reset search
+  document.getElementById("search-input").value = "";
+  currentQuery = "";
+  // Sembunyikan badge filter aktif
+  document.getElementById("filter-active-badge").style.display = "none";
+  // Tampilkan semua produk
+  applyFilters();
+}
+
+function renderResults(list) {
+  const grid  = document.getElementById("results-grid");
+  const noRes = document.getElementById("no-results");
+  const count = document.getElementById("results-count");
+
+  if (!list.length) {
+    grid.innerHTML = "";
+    noRes.style.display = "block";
+    count.textContent = "0 produk ditemukan";
+    return;
+  }
+
+  noRes.style.display = "none";
+  count.textContent = `${list.length} produk ditemukan`;
+  grid.innerHTML = list.map(p => {
+    const badgeClass = p.badge === "Premium" ? "premium" : p.badge === "Baru" ? "baru" : p.badge === "Second" ? "second" : "";
+    return `
+      <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'">
+        <span class="product-badge ${badgeClass}">${p.badge}</span>
+        <img class="product-img" src="${p.image}" alt="${p.name}" loading="lazy">
+        <div class="product-info">
+          <div class="product-name">${p.name}</div>
+          <div>
+            <span class="product-original">${formatPrice(p.originalPrice)}</span>
+            <span class="product-discount">-${p.discount}%</span>
+          </div>
+          <div class="product-price">${formatPrice(p.price)}</div>
+          <div class="product-rating">
+            <span class="stars">${renderStars(p.rating)}</span>
+            <span class="rating-count">${p.rating}</span>
+            <span class="product-sold">| ${p.sold.toLocaleString("id-ID")} terjual</span>
+          </div>
+        </div>
+        <button class="btn-cart" onclick="event.stopPropagation(); addToCart(${p.id})">+ Keranjang</button>
+      </div>`;
+  }).join("");
+}
+
+// Jalankan filter saat halaman pertama kali load
+applyFilters();
+</script>
+</body>
+</html>

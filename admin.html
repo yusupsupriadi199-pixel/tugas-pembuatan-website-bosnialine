@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - BOSNIALine</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="i18n.css">
+</head>
+<body>
+
+<!-- ============================================================
+     ADMIN LOGIN SCREEN
+     ============================================================ -->
+<div id="admin-login-screen" class="admin-login-screen">
+  <div class="admin-login-card">
+    <div class="admin-login-logo">💻 TOKO KOMPUTER BOSNIA<span>Line</span></div>
+    <div class="admin-login-title">🔧 Admin Panel</div>
+    <p class="admin-login-sub">Masuk untuk mengelola toko</p>
+
+    <form onsubmit="doAdminLogin(event)">
+      <div class="admin-login-field">
+        <label>Username</label>
+        <input type="text" id="admin-username" placeholder="admin" autocomplete="username" required>
+      </div>
+      <div class="admin-login-field">
+        <label>Password</label>
+        <div class="admin-pw-wrap">
+          <input type="password" id="admin-password" placeholder="••••••••" autocomplete="current-password" required>
+          <button type="button" onclick="toggleAdminPw(this)">👁</button>
+        </div>
+      </div>
+      <div id="admin-login-error" class="admin-login-error" style="display:none"></div>
+      <button type="submit" class="admin-login-btn">Masuk ke Admin Panel →</button>
+    </form>
+
+    <a href="index.html" class="admin-login-back">← Kembali ke Toko</a>
+  </div>
+</div>
+
+<!-- ============================================================
+     ADMIN PANEL (tersembunyi sampai login)
+     ============================================================ -->
+
+<div id="admin-panel-wrap" style="display:none">
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="index.html" class="logo">💻  TOKO KOMPUTERBOSNIA<span>Line</span></a>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:16px">
+      <span style="color:white;font-size:13px">🔧 Admin Panel</span>
+      <span id="admin-logged-name" style="color:#ffeb3b;font-size:13px;font-weight:700"></span>
+      <a href="index.html" class="nav-btn">← Toko</a>
+      <button class="nav-btn" onclick="doAdminLogout()" style="background:rgba(255,255,255,0.15);border-radius:6px;padding:6px 12px;border:1px solid rgba(255,255,255,0.3);font-size:12px;font-weight:700">🚪 Keluar</button>
+    </div>
+  </div>
+</nav>
+
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-menu">
+      <button class="menu-item active" onclick="showTab('daftar')">📦 Daftar Produk</button>
+      <button class="menu-item" onclick="showTab('tambah')">➕ Tambah Produk</button>
+      <button class="menu-item" onclick="showTab('pesanan')">🧾 Pesanan</button>
+      <button class="menu-item" onclick="showTab('statistik')">📊 Statistik</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="admin-main">
+
+    <!-- TAB: DAFTAR PRODUK -->
+    <div id="tab-daftar" class="tab-content active">
+      <div class="admin-header">
+        <h2>Daftar Produk</h2>
+        <button class="btn-primary" onclick="showTab('tambah')">+ Tambah Produk Baru</button>
+      </div>
+      <div class="search-bar-admin">
+        <input type="text" id="admin-search" placeholder="Cari produk..." oninput="renderTable()">
+      </div>
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Gambar</th><th>Nama Produk</th><th>Kategori</th>
+              <th>Harga</th><th>Stok</th><th>Badge</th><th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="product-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: TAMBAH / EDIT PRODUK -->
+    <div id="tab-tambah" class="tab-content">
+      <div class="admin-header">
+        <h2 id="form-title">Tambah Produk Baru</h2>
+        <button class="btn-secondary" onclick="resetForm(); showTab('daftar')">← Kembali</button>
+      </div>
+      <form class="product-form" onsubmit="saveProduct(event)">
+        <input type="hidden" id="edit-id">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nama Produk *</label>
+            <input type="text" id="f-name" placeholder="Contoh: Laptop ASUS VivoBook 15" required>
+          </div>
+          <div class="form-group">
+            <label>Kategori *</label>
+            <select id="f-category" required>
+              <option value="">-- Pilih Kategori --</option>
+              <option value="laptop">Laptop</option>
+              <option value="komputer">Komputer</option>
+              <option value="monitor">Monitor</option>
+              <option value="aksesoris">Aksesoris</option>
+              <option value="printer">Printer</option>
+              <option value="networking">Networking</option>
+              <option value="storage">Storage</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Harga Jual (Rp) *</label>
+            <input type="number" id="f-price" placeholder="8500000" required min="0">
+          </div>
+          <div class="form-group">
+            <label>Harga Asli / Coret (Rp) *</label>
+            <input type="number" id="f-original-price" placeholder="9500000" required min="0">
+          </div>
+          <div class="form-group">
+            <label>Diskon (%)</label>
+            <input type="number" id="f-discount" placeholder="10" min="0" max="100">
+          </div>
+          <div class="form-group">
+            <label>Stok *</label>
+            <input type="number" id="f-stock" placeholder="50" required min="0">
+          </div>
+          <div class="form-group">
+            <label>Rating (1-5)</label>
+            <input type="number" id="f-rating" placeholder="4.5" min="1" max="5" step="0.1">
+          </div>
+          <div class="form-group">
+            <label>Jumlah Terjual</label>
+            <input type="number" id="f-sold" placeholder="0" min="0">
+          </div>
+          <div class="form-group">
+            <label>Badge</label>
+            <select id="f-badge">
+              <option value="Baru">Baru</option>
+              <option value="Terlaris">Terlaris</option>
+              <option value="Best Seller">Best Seller</option>
+              <option value="Promo">Promo</option>
+              <option value="Diskon">Diskon</option>
+              <option value="Hemat">Hemat</option>
+              <option value="Premium">Premium</option>
+              <option value="Second">Second</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>URL Gambar Utama *</label>
+            <input type="url" id="f-image" placeholder="https://..." required>
+          </div>
+        </div>
+
+        <div class="form-group full">
+          <label>Spesifikasi *</label>
+          <input type="text" id="f-specs" placeholder="Intel Core i5 | RAM 8GB | SSD 512GB | 15.6 FHD" required>
+        </div>
+
+        <div class="form-group full">
+          <label>Deskripsi Produk *</label>
+          <textarea id="f-description" rows="4" placeholder="Tulis deskripsi lengkap produk..." required></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>URL Gambar Tambahan (pisahkan dengan koma)</label>
+          <input type="text" id="f-images" placeholder="https://img1.jpg, https://img2.jpg">
+        </div>
+
+        <div class="form-preview" id="form-preview" style="display:none">
+          <h4>Preview Produk</h4>
+          <div id="preview-card"></div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" onclick="previewProduct()">👁 Preview</button>
+          <button type="button" class="btn-secondary" onclick="resetForm()">🔄 Reset</button>
+          <button type="submit" class="btn-primary" id="btn-save">💾 Simpan & Publish</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- TAB: PESANAN -->
+    <div id="tab-pesanan" class="tab-content">
+      <div class="admin-header">
+        <h2>Manajemen Pesanan</h2>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="text" id="order-search-admin" placeholder="🔍 Cari ID / nama / email..." style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;width:220px" oninput="renderOrdersTable()">
+        </div>
+      </div>
+
+      <!-- STATUS TABS — klik langsung seperti Shopee -->
+      <div class="admin-status-tabs">
+        <button class="ast-btn active" data-status="" onclick="setAdminStatusTab(this)">
+          <span class="ast-icon">📋</span> Semua
+          <span class="ast-count" id="ast-count-all"></span>
+        </button>
+        <button class="ast-btn" data-status="pending" onclick="setAdminStatusTab(this)">
+          <span class="ast-icon">⏳</span> Menunggu Pembayaran
+          <span class="ast-count" id="ast-count-pending"></span>
+        </button>
+        <button class="ast-btn" data-status="paid" onclick="setAdminStatusTab(this)">
+          <span class="ast-icon">✅</span> Pembayaran Diterima
+          <span class="ast-count" id="ast-count-paid"></span>
+        </button>
+        <button class="ast-btn" data-status="processing" onclick="setAdminStatusTab(this)">
+          <span class="ast-icon">⚙️</span> Sedang Diproses
+          <span class="ast-count" id="ast-count-processing"></span>
+        </button>
+        <button class="ast-btn" data-status="shipped" onclick="setAdminStatusTab(this)">
+          <span class="ast-icon">🚚</span> Dalam Pengiriman
+          <span class="ast-count" id="ast-count-shipped"></span>
+        </button>
+        <button class="ast-btn" data-status="delivered" onclick="setAdminStatusTab(this)">
+          <span class="ast-icon">📦</span> Pesanan Tiba
+          <span class="ast-count" id="ast-count-delivered"></span>
+        </button>
+        <button class="ast-btn" data-status="cancelled" onclick="setAdminStatusTab(this)">
+          <span class="ast-icon">❌</span> Dibatalkan
+          <span class="ast-count" id="ast-count-cancelled"></span>
+        </button>
+      </div>
+
+      <!-- KARTU PESANAN (bukan tabel, lebih seperti Shopee) -->
+      <div id="orders-card-list"></div>
+
+      <div id="orders-empty" style="display:none;text-align:center;padding:48px;color:#9e9e9e">
+        <div style="font-size:48px">📭</div>
+        <p style="margin-top:12px;font-size:15px">Belum ada pesanan di kategori ini</p>
+      </div>
+    </div>
+
+    <!-- MODAL DETAIL + UPDATE STATUS -->
+    <div class="modal-overlay" id="order-detail-modal" onclick="if(event.target===this)closeOrderDetailModal()">
+      <div class="order-modal-box" onclick="event.stopPropagation()">
+        <div class="order-modal-header">
+          <h3>Detail Pesanan</h3>
+          <button onclick="closeOrderDetailModal()">✕</button>
+        </div>
+        <div id="order-detail-modal-content"></div>
+      </div>
+    </div>
+
+    <!-- TAB: STATISTIK -->
+    <div id="tab-statistik" class="tab-content">
+      <div class="admin-header"><h2>Statistik Produk</h2></div>
+      <div class="stat-grid" id="stat-grid"></div>
+      <div class="section" style="margin-top:24px">
+        <h3 style="margin-bottom:16px">Produk Terlaris</h3>
+        <div class="product-grid" id="stat-top-products"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL KONFIRMASI HAPUS -->
+<div class="modal-overlay" id="delete-modal" onclick="if(event.target===this)closeDeleteModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <h3>Hapus Produk?</h3>
+    <p id="delete-modal-name"></p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeDeleteModal()">Batal</button>
+      <button class="btn-danger" onclick="confirmDelete()">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script src="admin.js"></script>
+<script src="i18n.js"></script>
+
+</div><!-- end admin-panel-wrap -->
+
+<script>
+// ============================================================
+// ADMIN AUTH
+// ============================================================
+const ADMIN_ACCOUNTS = [
+  { username: "admin",    password: "admin123",   name: "Administrator" },
+  { username: "bosnialine", password: "bosnia2026", name: "BOSNIALine" }
+];
+const ADMIN_SESSION_KEY = "bosnialine_admin_session";
+
+function checkAdminSession() {
+  const session = localStorage.getItem(ADMIN_SESSION_KEY);
+  if (session) {
+    const acc = ADMIN_ACCOUNTS.find(a => a.username === session);
+    if (acc) {
+      showAdminPanel(acc);
+      return;
+    }
+  }
+  // Tampilkan login screen
+  document.getElementById("admin-login-screen").style.display = "flex";
+}
+
+function doAdminLogin(e) {
+  e.preventDefault();
+  const username = document.getElementById("admin-username").value.trim();
+  const password = document.getElementById("admin-password").value;
+  const errEl = document.getElementById("admin-login-error");
+
+  const acc = ADMIN_ACCOUNTS.find(a => a.username === username && a.password === password);
+  if (!acc) {
+    errEl.textContent = "Username atau password salah.";
+    errEl.style.display = "block";
+    document.getElementById("admin-password").value = "";
+    // Shake animation
+    document.querySelector(".admin-login-card").classList.add("shake");
+    setTimeout(() => document.querySelector(".admin-login-card").classList.remove("shake"), 500);
+    return;
+  }
+
+  localStorage.setItem(ADMIN_SESSION_KEY, acc.username);
+  showAdminPanel(acc);
+}
+
+function showAdminPanel(acc) {
+  document.getElementById("admin-login-screen").style.display = "none";
+  document.getElementById("admin-panel-wrap").style.display = "block";
+  const nameEl = document.getElementById("admin-logged-name");
+  if (nameEl) nameEl.textContent = "👤 " + acc.name;
+}
+
+function doAdminLogout() {
+  if (!confirm("Yakin ingin keluar dari Admin Panel?")) return;
+  localStorage.removeItem(ADMIN_SESSION_KEY);
+  window.location.reload();
+}
+
+function toggleAdminPw(btn) {
+  const inp = document.getElementById("admin-password");
+  inp.type = inp.type === "password" ? "text" : "password";
+  btn.textContent = inp.type === "password" ? "👁" : "🙈";
+}
+
+// Jalankan saat halaman load
+checkAdminSession();
+</script>
+</body>
+</html>

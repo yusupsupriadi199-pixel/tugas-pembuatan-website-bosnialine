@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Produk - BOSNIALine</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="cart.css">
+  <link rel="stylesheet" href="i18n.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="index.html" class="logo">💻 TOKO KOMPUTER BOSNIA<span>Line</span></a>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Cari produk..." />
+      <button onclick="doSearch()">🔍</button>
+    </div>
+    <div class="nav-actions">
+      <button class="nav-btn cart-trigger" style="position:relative">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge" id="cart-badge" style="display:none">0</span>
+        Keranjang
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <!-- BREADCRUMB -->
+  <div style="padding:12px 0;font-size:13px;color:#757575">
+    <a href="index.html" style="color:#1565c0">Beranda</a> &rsaquo;
+    <a href="search.html" style="color:#1565c0">Produk</a> &rsaquo;
+    <span id="breadcrumb-name">Detail Produk</span>
+  </div>
+
+  <div class="detail-layout" id="detail-layout">
+    <!-- Diisi oleh JS -->
+  </div>
+
+  <!-- REKOMENDASI -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Produk Lainnya</h2>
+      <a href="search.html" class="see-all">Lihat Semua →</a>
+    </div>
+    <div class="product-grid" id="recommended-grid"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-bottom" style="border:none;padding:20px;text-align:center;font-size:12px;color:#bdbdbd">
+    © 2026 BOSNIALine. Semua hak dilindungi.
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script src="auth.js"></script>
+<script src="cart.js"></script>
+<script src="i18n.js"></script>
+<script>
+function doSearch() {
+  const q = document.getElementById("search-input").value.trim();
+  window.location.href = `search.html?q=${encodeURIComponent(q)}`;
+}
+document.getElementById("search-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") doSearch();
+});
+
+const params = new URLSearchParams(window.location.search);
+const productId = parseInt(params.get("id"));
+const product = getProduct(productId);
+
+if (!product) {
+  document.getElementById("detail-layout").innerHTML = `
+    <div style="grid-column:1/-1;text-align:center;padding:60px;color:#757575">
+      <div style="font-size:48px">😕</div>
+      <p style="margin-top:12px">Produk tidak ditemukan.</p>
+      <a href="index.html" style="color:#e53935;font-weight:600">Kembali ke Beranda</a>
+    </div>`;
+} else {
+  document.title = product.name + " - BOSNIALine";
+  document.getElementById("breadcrumb-name").textContent = product.name;
+
+  let qty = 1;
+  const savings = product.originalPrice - product.price;
+
+  document.getElementById("detail-layout").innerHTML = `
+    <!-- GALLERY -->
+    <div class="gallery">
+      <div class="main-img">
+        <img id="main-photo" src="${product.images[0]}" alt="${product.name}">
+      </div>
+      <div class="thumb-list">
+        ${product.images.map((img, i) => `
+          <div class="thumb ${i === 0 ? 'active' : ''}" onclick="switchImg(this, '${img}')">
+            <img src="${img}" alt="foto ${i+1}">
+          </div>`).join("")}
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="detail-info">
+      <span class="detail-badge">${product.badge}</span>
+      <h1 class="detail-name">${product.name}</h1>
+
+      <div class="detail-rating">
+        <span class="detail-stars">${renderStars(product.rating)}</span>
+        <span class="detail-rating-num">${product.rating}</span>
+        <span class="detail-reviews">(${product.reviews} ulasan)</span>
+        <span class="detail-sold">${product.sold.toLocaleString("id-ID")} terjual</span>
+      </div>
+
+      <div class="price-box">
+        <div class="price-row">
+          <span class="original-price">${formatPrice(product.originalPrice)}</span>
+          <span class="discount-badge">-${product.discount}%</span>
+        </div>
+        <div class="current-price">${formatPrice(product.price)}</div>
+        <div class="savings">Hemat ${formatPrice(savings)}</div>
+      </div>
+
+      <div class="specs-box">
+        <h4>Spesifikasi</h4>
+        <p>${product.specs}</p>
+      </div>
+
+      <div class="stock-info">Stok: <span>${product.stock} unit tersedia</span></div>
+
+      <div class="qty-row">
+        <span class="qty-label">Jumlah:</span>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
+          <input class="qty-num" id="qty-display" type="text" value="1" readonly>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+      </div>
+
+      <div class="action-btns">
+        <button class="btn-buy" onclick="buyNow()">⚡ Beli Sekarang</button>
+        <button class="btn-add-cart" onclick="addToCartDetail()">🛒 + Keranjang</button>
+      </div>
+
+      <div class="guarantee-row">
+        <a href="layanan.html#garansi" class="guarantee-item">✅ Garansi Resmi</a>
+        <a href="layanan.html#ongkir" class="guarantee-item">🚚 Gratis Ongkir</a>
+        <a href="layanan.html#retur" class="guarantee-item">↩️ Retur 7 Hari</a>
+        <a href="layanan.html#cicilan" class="guarantee-item">💳 Cicilan 0%</a>
+      </div>
+
+      <div class="desc-section">
+        <h3>Deskripsi Produk</h3>
+        <p>${product.description}</p>
+      </div>
+    </div>`;
+
+  // Qty logic
+  window.changeQty = function(delta) {
+    qty = Math.max(1, Math.min(product.stock, qty + delta));
+    document.getElementById("qty-display").value = qty;
+  };
+
+  window.switchImg = function(el, src) {
+    document.getElementById("main-photo").src = src;
+    document.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
+    el.classList.add("active");
+  };
+
+  window.addToCartDetail = function() {
+    addToCart(product.id, qty);
+    openCart();
+  };
+
+  window.buyNow = function() {
+    addToCart(product.id, qty);
+    window.location.href = "checkout.html";
+  };
+
+  // Rekomendasi
+  const recs = getRecommended(product.id, 4);
+  document.getElementById("recommended-grid").innerHTML = recs.map(p => {
+    const badgeClass = p.badge === "Premium" ? "premium" : p.badge === "Baru" ? "baru" : p.badge === "Second" ? "second" : "";
+    return `
+      <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'">
+        <span class="product-badge ${badgeClass}">${p.badge}</span>
+        <img class="product-img" src="${p.image}" alt="${p.name}" loading="lazy">
+        <div class="product-info">
+          <div class="product-name">${p.name}</div>
+          <div>
+            <span class="product-original">${formatPrice(p.originalPrice)}</span>
+            <span class="product-discount">-${p.discount}%</span>
+          </div>
+          <div class="product-price">${formatPrice(p.price)}</div>
+          <div class="product-rating">
+            <span class="stars">${renderStars(p.rating)}</span>
+            <span class="rating-count">${p.rating}</span>
+          </div>
+        </div>
+        <button class="btn-cart" onclick="event.stopPropagation(); addToCart(${p.id})">+ Keranjang</button>
+      </div>`;
+  }).join("");
+}
+</script>
+</body>
+</html>

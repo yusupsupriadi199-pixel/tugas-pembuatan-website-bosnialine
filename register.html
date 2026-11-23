@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar - BOSNIALine</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body class="auth-page-body">
+
+<div class="auth-page-wrap">
+  <div class="auth-page-left">
+    <a href="index.html" class="auth-page-logo">💻 BOSNIA<span>Line</span></a>
+    <h2>Daftar sebagai Pembeli<br>di BOSNIALine</h2>
+    <p>Masuk atau buat akun untuk mulai belanja dan nikmati promo menarik.</p>
+    <ul class="auth-benefits">
+      <li>✅ Lacak pesanan secara real-time</li>
+      <li>✅ Simpan alamat pengiriman</li>
+      <li>✅ Riwayat pesanan dan retur mudah</li>
+    </ul>
+    <div class="auth-page-illustration">🛍️</div>
+  </div>
+
+  <div class="auth-page-right">
+    <div class="auth-page-card">
+      <h3>Daftar Akun</h3>
+      <form id="form-register" onsubmit="handleRegisterPage(event)">
+        <div class="auth-field">
+          <label>Nama Lengkap</label>
+          <input type="text" id="reg-name" placeholder="Nama lengkap kamu" required>
+        </div>
+        <div class="auth-field">
+          <label>Email</label>
+          <input type="email" id="reg-email" placeholder="email@contoh.com" required autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label>No. Telepon</label>
+          <div class="auth-phone-wrap">
+            <span class="auth-phone-prefix">+62</span>
+            <input type="tel" id="reg-phone" placeholder="8xx-xxxx-xxxx" required
+              autocomplete="tel" inputmode="numeric">
+          </div>
+          <span id="reg-phone-feedback" class="phone-feedback"></span>
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <div class="auth-pw-wrap">
+            <input type="password" id="reg-password" placeholder="Min. 6 karakter" required minlength="6" autocomplete="new-password" oninput="checkPwStrength(this.value)">
+            <button type="button" class="auth-pw-toggle" onclick="togglePwPage('reg-password',this)">👁</button>
+          </div>
+          <div class="pw-strength-bar"><div id="pw-strength-fill"></div></div>
+          <div id="pw-strength-label" class="pw-strength-label"></div>
+        </div>
+        <div class="auth-field">
+          <label>Konfirmasi Password</label>
+          <div class="auth-pw-wrap">
+            <input type="password" id="reg-password2" placeholder="Ulangi password" required autocomplete="new-password">
+            <button type="button" class="auth-pw-toggle" onclick="togglePwPage('reg-password2',this)">👁</button>
+          </div>
+        </div>
+        <div id="reg-error" class="auth-error" style="display:none"></div>
+        <div class="auth-tos">
+          <input type="checkbox" id="reg-tos" required>
+          <label for="reg-tos">Saya setuju dengan <a href="#">Syarat & Ketentuan</a> dan <a href="#">Kebijakan Privasi</a></label>
+        </div>
+        <button type="submit" class="auth-submit-btn">Daftar Sekarang 🎉</button>
+        <p style="text-align:center;margin-top:12px">Sudah punya akun? <a href="login.html">Masuk</a></p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+// Reuse some helper functions from login.html (pw strength, toggle)
+function togglePwPage(id, btn) {
+  const inp = document.getElementById(id);
+  inp.type = inp.type === "password" ? "text" : "password";
+  btn.textContent = inp.type === "password" ? "👁" : "🙈";
+}
+function checkPwStrength(val) {
+  const fill = document.getElementById("pw-strength-fill");
+  const label = document.getElementById("pw-strength-label");
+  let score = 0;
+  if (val.length >= 6) score++;
+  if (val.length >= 10) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const levels = [
+    { pct: "20%", color: "#e53935", text: "Sangat Lemah" },
+    { pct: "40%", color: "#ff6f00", text: "Lemah" },
+    { pct: "60%", color: "#ffa000", text: "Cukup" },
+    { pct: "80%", color: "#43a047", text: "Kuat" },
+    { pct: "100%", color: "#2e7d32", text: "Sangat Kuat" }
+  ];
+  const lv = levels[Math.max(0, score - 1)] || levels[0];
+  fill.style.width = lv.pct;
+  fill.style.background = lv.color;
+  label.textContent = val ? lv.text : "";
+  label.style.color = lv.color;
+}
+
+async function handleRegisterPage(e) {
+  e.preventDefault();
+  const name = document.getElementById("reg-name").value.trim();
+  const email = document.getElementById("reg-email").value.trim();
+  const phone = "+62" + document.getElementById("reg-phone").value.trim();
+  const password = document.getElementById("reg-password").value;
+  const password2 = document.getElementById("reg-password2").value;
+  if (password !== password2) {
+    const el = document.getElementById("reg-error"); el.textContent = "Password tidak cocok."; el.style.display = "block"; return;
+  }
+  const res = await authRegister({ name, email, phone, password });
+  if (!res.ok) { const el = document.getElementById("reg-error"); el.textContent = res.msg; el.style.display = "block"; return; }
+  window.location.href = "index.html";
+}
+
+// Redirect if already logged in
+document.addEventListener('DOMContentLoaded', () => {
+  const _u = getCurrentUser();
+  if (_u) window.location.href = 'index.html';
+});
+</script>
+<script src="auth.js"></script>
+</body>
+</html>

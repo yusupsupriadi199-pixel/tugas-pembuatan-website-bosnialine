@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - BOSNIALine</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="cart.css">
+  <link rel="stylesheet" href="checkout.css">
+  <link rel="stylesheet" href="i18n.css">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="index.html" class="logo">💻 BOSNIA<span>Line</span></a>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:16px">
+      <span style="color:white;font-size:14px;font-weight:600">🔒 Checkout Aman</span>
+    </div>
+  </div>
+</nav>
+
+<!-- STEP INDICATOR -->
+<div class="co-steps">
+  <div class="co-step active" id="step-ind-1"><span class="co-step-num">1</span><span class="co-step-label">Alamat</span></div>
+  <div class="co-step-line" id="line-1-2"></div>
+  <div class="co-step" id="step-ind-2"><span class="co-step-num">2</span><span class="co-step-label">Pengiriman</span></div>
+  <div class="co-step-line" id="line-2-3"></div>
+  <div class="co-step" id="step-ind-3"><span class="co-step-num">3</span><span class="co-step-label">Pembayaran</span></div>
+  <div class="co-step-line" id="line-3-4"></div>
+  <div class="co-step" id="step-ind-4"><span class="co-step-num">4</span><span class="co-step-label">Konfirmasi</span></div>
+</div>
+
+<div class="container">
+  <div class="co-layout">
+
+    <!-- LEFT: FORM STEPS -->
+    <div class="co-form-area">
+
+      <!-- ==================== STEP 1: ALAMAT ==================== -->
+      <div class="co-step-panel" id="step-1">
+        <div class="co-panel-header">
+          <span class="co-panel-icon">📍</span>
+          <h2>Alamat Pengiriman</h2>
+        </div>
+
+        <!-- Banner login -->
+        <div id="checkout-login-banner" style="display:none;background:#fff4e5;border:1.5px solid #ffcc80;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:22px">👤</span>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:#e65100">Masuk untuk pengalaman belanja lebih mudah</div>
+            <div style="font-size:12px;color:#bf360c;margin-top:2px">Alamat & data kamu akan terisi otomatis</div>
+          </div>
+          <a href="login.html" class="co-btn-primary" style="padding:7px 16px;font-size:12px;white-space:nowrap">Masuk</a>
+        </div>
+
+        <!-- Alamat tersimpan -->
+        <div id="saved-addr-section" style="display:none;margin-bottom:16px">
+          <div class="co-section-label">📍 Pilih Alamat Tersimpan</div>
+          <div id="saved-addr-list" style="display:flex;flex-direction:column;gap:8px;margin-top:8px"></div>
+          <button type="button" onclick="toggleNewAddrForm()" class="co-btn-outline" style="margin-top:10px;width:100%">+ Gunakan Alamat Lain</button>
+        </div>
+
+        <form id="addr-form" onsubmit="goStep(2); return false;">
+          <div class="co-form-grid">
+            <div class="co-field">
+              <label>Nama Lengkap <span class="req">*</span></label>
+              <input type="text" id="c-name" placeholder="Nama penerima" required>
+            </div>
+            <div class="co-field">
+              <label>No. Telepon <span class="req">*</span></label>
+              <input type="tel" id="c-phone" placeholder="08xx-xxxx-xxxx" inputmode="numeric" required>
+            </div>
+            <div class="co-field">
+              <label>Email <span class="req">*</span></label>
+              <input type="email" id="c-email" placeholder="email@contoh.com" required>
+            </div>
+            <div class="co-field">
+              <label>Provinsi <span class="req">*</span></label>
+              <select id="c-province" required>
+                <option value="">-- Pilih Provinsi --</option>
+                <option>DKI Jakarta</option><option>Jawa Barat</option><option>Jawa Tengah</option>
+                <option>Jawa Timur</option><option>Banten</option><option>DI Yogyakarta</option>
+                <option>Sumatera Utara</option><option>Sumatera Selatan</option><option>Kalimantan Timur</option>
+                <option>Sulawesi Selatan</option><option>Bali</option><option>Lainnya</option>
+              </select>
+            </div>
+            <div class="co-field">
+              <label>Kota / Kabupaten <span class="req">*</span></label>
+              <input type="text" id="c-city" placeholder="Contoh: Bogor" required>
+            </div>
+            <div class="co-field">
+              <label>Kecamatan</label>
+              <input type="text" id="c-district" placeholder="Contoh: Bogor Tengah">
+            </div>
+            <div class="co-field">
+              <label>Kelurahan</label>
+              <input type="text" id="c-village" placeholder="Contoh: Sempur">
+            </div>
+            <div class="co-field">
+              <label>Kode Pos <span class="req">*</span></label>
+              <input type="text" id="c-zip" placeholder="16310" required maxlength="5" inputmode="numeric">
+            </div>
+          </div>
+          <div class="co-field" style="margin-bottom:14px">
+            <label>Alamat Lengkap <span class="req">*</span></label>
+            <textarea id="c-address" rows="3" placeholder="Jl. Nama Jalan No. XX, RT/RW, Kelurahan, Kecamatan" required></textarea>
+          </div>
+          <div class="co-field" style="margin-bottom:20px">
+            <label>Label Alamat</label>
+            <div class="co-label-chips">
+              <button type="button" class="co-chip active" onclick="selectLabelChip(this,'Rumah')">🏠 Rumah</button>
+              <button type="button" class="co-chip" onclick="selectLabelChip(this,'Kantor')">🏢 Kantor</button>
+              <button type="button" class="co-chip" onclick="selectLabelChip(this,'Kos')">🏡 Kos</button>
+            </div>
+            <input type="hidden" id="c-label" value="Rumah">
+          </div>
+          <div class="co-field" style="margin-bottom:20px">
+            <label>Catatan untuk Kurir (opsional)</label>
+            <input type="text" id="c-note" placeholder="Contoh: Titip ke satpam jika tidak ada di rumah">
+          </div>
+          <div class="co-actions">
+            <a href="index.html" class="co-btn-outline">← Lanjut Belanja</a>
+            <button type="submit" class="co-btn-primary">Pilih Pengiriman →</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ==================== STEP 2: PENGIRIMAN ==================== -->
+      <div class="co-step-panel" id="step-2" style="display:none">
+        <div class="co-panel-header">
+          <span class="co-panel-icon">🚚</span>
+          <h2>Metode Pengiriman</h2>
+        </div>
+
+        <!-- Alamat terpilih (ringkasan) -->
+        <div class="co-addr-summary" id="addr-summary-box">
+          <span class="co-addr-icon">📍</span>
+          <div class="co-addr-summary-info">
+            <div class="co-addr-name" id="sum-name">-</div>
+            <div class="co-addr-detail" id="sum-addr">-</div>
+          </div>
+          <button type="button" class="co-btn-link" onclick="goStep(1)">Ubah</button>
+        </div>
+
+        <!-- Voucher Gratis Ongkir -->
+        <div class="co-voucher-bar">
+          <span>🏷️</span>
+          <span style="flex:1;font-size:13px;color:#e53935;font-weight:600">Voucher Gratis Ongkir tersedia!</span>
+          <button type="button" class="co-btn-link" onclick="applyFreeShip()">Gunakan</button>
+        </div>
+
+        <div class="co-section-label" style="margin-bottom:10px">Pilih Kurir & Layanan</div>
+        <div class="co-shipping-list" id="shipping-options">
+          <label class="co-shipping-opt">
+            <input type="radio" name="shipping" value="jne_reg" data-cost="25000" data-eta="3-5 hari kerja" checked>
+            <div class="co-ship-logo">JNE</div>
+            <div class="co-ship-info">
+              <div class="co-ship-name">JNE Reguler</div>
+              <div class="co-ship-eta">Estimasi tiba <strong>3-5 hari kerja</strong></div>
+            </div>
+            <div class="co-ship-cost">Rp 25.000</div>
+          </label>
+          <label class="co-shipping-opt">
+            <input type="radio" name="shipping" value="jne_yes" data-cost="45000" data-eta="1-2 hari kerja">
+            <div class="co-ship-logo" style="color:#e53935">JNE</div>
+            <div class="co-ship-info">
+              <div class="co-ship-name">JNE YES <span class="co-ship-badge">Yakin Esok Sampai</span></div>
+              <div class="co-ship-eta">Estimasi tiba <strong>1-2 hari kerja</strong></div>
+            </div>
+            <div class="co-ship-cost">Rp 45.000</div>
+          </label>
+          <label class="co-shipping-opt">
+            <input type="radio" name="shipping" value="sicepat" data-cost="20000" data-eta="2-4 hari kerja">
+            <div class="co-ship-logo" style="color:#ff6f00">SiCepat</div>
+            <div class="co-ship-info">
+              <div class="co-ship-name">SiCepat Reguler</div>
+              <div class="co-ship-eta">Estimasi tiba <strong>2-4 hari kerja</strong></div>
+            </div>
+            <div class="co-ship-cost">Rp 20.000</div>
+          </label>
+          <label class="co-shipping-opt">
+            <input type="radio" name="shipping" value="anteraja" data-cost="18000" data-eta="2-3 hari kerja">
+            <div class="co-ship-logo" style="color:#f44336">AnterAja</div>
+            <div class="co-ship-info">
+              <div class="co-ship-name">AnterAja Reguler</div>
+              <div class="co-ship-eta">Estimasi tiba <strong>2-3 hari kerja</strong></div>
+            </div>
+            <div class="co-ship-cost">Rp 18.000</div>
+          </label>
+          <label class="co-shipping-opt">
+            <input type="radio" name="shipping" value="gosend" data-cost="0" data-eta="Hari ini (max 8 jam)">
+            <div class="co-ship-logo" style="color:#00aed6">GoSend</div>
+            <div class="co-ship-info">
+              <div class="co-ship-name">GoSend Same Day <span class="co-ship-badge green">Area Jabodetabek</span></div>
+              <div class="co-ship-eta">Estimasi tiba <strong>hari ini, max 8 jam</strong></div>
+            </div>
+            <div class="co-ship-cost free">GRATIS</div>
+          </label>
+        </div>
+
+        <div class="co-actions">
+          <button class="co-btn-outline" onclick="goStep(1)">← Kembali</button>
+          <button class="co-btn-primary" onclick="goStep(3)">Pilih Pembayaran →</button>
+        </div>
+      </div>
+
+      <!-- ==================== STEP 3: PEMBAYARAN ==================== -->
+      <div class="co-step-panel" id="step-3" style="display:none">
+        <div class="co-panel-header">
+          <span class="co-panel-icon">💳</span>
+          <h2>Metode Pembayaran</h2>
+        </div>
+
+        <!-- Voucher input -->
+        <div class="co-voucher-input-row">
+          <span>🏷️</span>
+          <input type="text" id="voucher-code" placeholder="Masukkan kode voucher / promo">
+          <button type="button" onclick="applyVoucher()" class="co-btn-primary" style="padding:9px 16px;font-size:13px">Gunakan</button>
+        </div>
+        <div id="voucher-msg" style="font-size:12px;margin-bottom:12px;display:none"></div>
+
+        <!-- === E-WALLET === -->
+        <div class="co-pay-group">
+          <div class="co-pay-group-title">💚 E-Wallet</div>
+          <div class="co-pay-grid">
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="shopeepay">
+              <div class="co-pay-icon" style="background:#ee4d2d">
+                <span style="color:white;font-size:11px;font-weight:900">ShopeePay</span>
+              </div>
+              <div class="co-pay-name">ShopeePay</div>
+              <div class="co-pay-balance" id="shopeepay-bal"></div>
+            </label>
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="gopay">
+              <div class="co-pay-icon" style="background:#00aed6">
+                <span style="color:white;font-size:13px;font-weight:900">G</span>
+              </div>
+              <div class="co-pay-name">GoPay</div>
+            </label>
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="ovo">
+              <div class="co-pay-icon" style="background:#4c3494">
+                <span style="color:white;font-size:11px;font-weight:900">OVO</span>
+              </div>
+              <div class="co-pay-name">OVO</div>
+            </label>
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="dana">
+              <div class="co-pay-icon" style="background:#118eea">
+                <span style="color:white;font-size:11px;font-weight:900">DANA</span>
+              </div>
+              <div class="co-pay-name">DANA</div>
+            </label>
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="linkaja">
+              <div class="co-pay-icon" style="background:#e53935">
+                <span style="color:white;font-size:10px;font-weight:900">LinkAja</span>
+              </div>
+              <div class="co-pay-name">LinkAja</div>
+            </label>
+          </div>
+        </div>
+
+        <!-- === VIRTUAL ACCOUNT === -->
+        <div class="co-pay-group">
+          <div class="co-pay-group-title">🏦 Transfer Virtual Account</div>
+          <div class="co-pay-grid">
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="bca">
+              <div class="co-pay-icon" style="background:#005baa">
+                <span style="color:white;font-size:11px;font-weight:900">BCA</span>
+              </div>
+              <div class="co-pay-name">BCA VA</div>
+            </label>
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="bni">
+              <div class="co-pay-icon" style="background:#f26522">
+                <span style="color:white;font-size:11px;font-weight:900">BNI</span>
+              </div>
+              <div class="co-pay-name">BNI VA</div>
+            </label>
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="bri">
+              <div class="co-pay-icon" style="background:#00529b">
+                <span style="color:white;font-size:11px;font-weight:900">BRI</span>
+              </div>
+              <div class="co-pay-name">BRI VA</div>
+            </label>
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="mandiri">
+              <div class="co-pay-icon" style="background:#003d79">
+                <span style="color:white;font-size:10px;font-weight:900">Mandiri</span>
+              </div>
+              <div class="co-pay-name">Mandiri VA</div>
+            </label>
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="bsi">
+              <div class="co-pay-icon" style="background:#2e7d32">
+                <span style="color:white;font-size:11px;font-weight:900">BSI</span>
+              </div>
+              <div class="co-pay-name">BSI VA</div>
+            </label>
+          </div>
+        </div>
+
+        <!-- === QRIS === -->
+        <div class="co-pay-group">
+          <div class="co-pay-group-title">📱 QRIS</div>
+          <div class="co-pay-grid">
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="qris">
+              <div class="co-pay-icon" style="background:#e53935">
+                <span style="color:white;font-size:11px;font-weight:900">QRIS</span>
+              </div>
+              <div class="co-pay-name">Semua E-Wallet</div>
+            </label>
+          </div>
+        </div>
+
+        <!-- === MINIMARKET === -->
+        <div class="co-pay-group">
+          <div class="co-pay-group-title">🏪 Bayar di Minimarket</div>
+          <div class="co-pay-grid">
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="indomaret">
+              <div class="co-pay-icon" style="background:#e53935">
+                <span style="color:white;font-size:9px;font-weight:900">Indomaret</span>
+              </div>
+              <div class="co-pay-name">Indomaret</div>
+            </label>
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="alfamart">
+              <div class="co-pay-icon" style="background:#e53935">
+                <span style="color:white;font-size:9px;font-weight:900">Alfamart</span>
+              </div>
+              <div class="co-pay-name">Alfamart</div>
+            </label>
+          </div>
+        </div>
+
+        <!-- === KARTU KREDIT === -->
+        <div class="co-pay-group">
+          <div class="co-pay-group-title">💳 Kartu Kredit / Cicilan 0%</div>
+          <div class="co-pay-grid">
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="cicilan_bca">
+              <div class="co-pay-icon" style="background:#005baa"><span style="color:white;font-size:10px;font-weight:900">BCA</span></div>
+              <div class="co-pay-name">Cicilan BCA</div>
+            </label>
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="cicilan_mandiri">
+              <div class="co-pay-icon" style="background:#003d79"><span style="color:white;font-size:9px;font-weight:900">Mandiri</span></div>
+              <div class="co-pay-name">Cicilan Mandiri</div>
+            </label>
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="cicilan_bni">
+              <div class="co-pay-icon" style="background:#f26522"><span style="color:white;font-size:10px;font-weight:900">BNI</span></div>
+              <div class="co-pay-name">Cicilan BNI</div>
+            </label>
+            <label class="co-pay-opt">
+              <input type="radio" name="payment" value="cicilan_bri">
+              <div class="co-pay-icon" style="background:#00529b"><span style="color:white;font-size:10px;font-weight:900">BRI</span></div>
+              <div class="co-pay-name">Cicilan BRI</div>
+            </label>
+          </div>
+          <!-- Tenor pilihan -->
+          <div id="tenor-box" style="display:none;margin-top:12px;padding:14px;background:#f5f5f5;border-radius:10px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:10px">Pilih Tenor Cicilan:</div>
+            <div class="co-tenor-opts">
+              <label class="co-tenor-opt"><input type="radio" name="tenor" value="3" checked onchange="calcCicilan()"><span>3x</span></label>
+              <label class="co-tenor-opt"><input type="radio" name="tenor" value="6" onchange="calcCicilan()"><span>6x</span></label>
+              <label class="co-tenor-opt"><input type="radio" name="tenor" value="12" onchange="calcCicilan()"><span>12x</span></label>
+              <label class="co-tenor-opt"><input type="radio" name="tenor" value="24" onchange="calcCicilan()"><span>24x</span></label>
+            </div>
+            <div id="cicilan-result" style="margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- === COD === -->
+        <div class="co-pay-group">
+          <div class="co-pay-group-title">💵 Bayar di Tempat (COD)</div>
+          <label class="co-pay-cod">
+            <input type="radio" name="payment" value="cod">
+            <span class="co-cod-icon">💵</span>
+            <div>
+              <div style="font-size:14px;font-weight:700">Bayar di Tempat (COD)</div>
+              <div style="font-size:12px;color:#616161;margin-top:2px">Bayar tunai saat barang tiba. Tersedia untuk beberapa wilayah.</div>
+            </div>
+          </label>
+        </div>
+
+        <!-- Instruksi pembayaran -->
+        <div id="payment-instructions-area" style="margin-top:4px"></div>
+
+        <div class="co-actions">
+          <button class="co-btn-outline" onclick="goStep(2)">← Kembali</button>
+          <button class="co-btn-primary" onclick="proceedToConfirm()">Periksa Pesanan →</button>
+        </div>
+      </div>
+
+      <!-- ==================== STEP 4: KONFIRMASI & SUKSES ==================== -->
+      <div class="co-step-panel" id="step-4" style="display:none">
+
+        <!-- ===== REVIEW SEBELUM BAYAR ===== -->
+        <div id="order-review-section">
+          <div class="co-panel-header">
+            <span class="co-panel-icon">🛒</span>
+            <h2>Periksa Pesanan</h2>
+          </div>
+
+          <!-- Ringkasan Alamat -->
+          <div class="co-review-block">
+            <div class="co-review-block-title">📍 Alamat Pengiriman <button type="button" class="co-btn-link" onclick="goStep(1)">Ubah</button></div>
+            <div id="review-addr" class="co-review-content"></div>
+          </div>
+
+          <!-- Ringkasan Pengiriman -->
+          <div class="co-review-block">
+            <div class="co-review-block-title">🚚 Pengiriman <button type="button" class="co-btn-link" onclick="goStep(2)">Ubah</button></div>
+            <div id="review-shipping" class="co-review-content"></div>
+          </div>
+
+          <!-- Ringkasan Pembayaran -->
+          <div class="co-review-block">
+            <div class="co-review-block-title">💳 Metode Pembayaran <button type="button" class="co-btn-link" onclick="goStep(3)">Ubah</button></div>
+            <div id="review-payment" class="co-review-content"></div>
+          </div>
+
+          <!-- Daftar Item -->
+          <div class="co-review-block">
+            <div class="co-review-block-title">🛍️ Pesanan</div>
+            <div id="review-items" class="co-review-content"></div>
+          </div>
+
+          <!-- Ringkasan Harga -->
+          <div class="co-price-summary" id="review-price-summary"></div>
+
+          <!-- Catatan -->
+          <div style="font-size:12px;color:#757575;margin:12px 0 20px;text-align:center">
+            🔒 Dengan melanjutkan, kamu menyetujui <a href="#" style="color:#e53935">Syarat & Ketentuan</a> BOSNIALine
+          </div>
+
+          <button class="co-btn-pay" id="btn-place-order" onclick="placeOrder()">
+            Bayar Sekarang
+          </button>
+        </div>
+
+        <!-- ===== SUKSES SETELAH BAYAR ===== -->
+        <div id="order-success-section" style="display:none">
+          <div class="co-success-header">
+            <div class="co-success-icon">🎉</div>
+            <h2>Pesanan Berhasil Dibuat!</h2>
+            <p>Pesanan kamu sedang diproses dan akan segera dikirim.</p>
+          </div>
+
+          <!-- ID Pesanan -->
+          <div class="co-order-id-card">
+            <span style="font-size:12px;color:#757575">No. Pesanan</span>
+            <strong id="order-id-display" style="font-size:16px;font-family:monospace;color:#e53935">-</strong>
+            <button class="co-btn-copy-sm" onclick="copyOrderId()">Salin</button>
+          </div>
+
+          <!-- Instruksi pembayaran pasca order -->
+          <div id="post-payment-instructions" style="margin:16px 0"></div>
+
+          <!-- Ringkasan pesanan -->
+          <div class="co-confirm-block" id="printable-area">
+            <div class="co-confirm-block-title">📋 Ringkasan Pesanan</div>
+            <div class="co-confirm-rows" id="confirm-detail-rows"></div>
+            <div id="confirm-items-list" style="margin-top:10px"></div>
+            <div class="co-confirm-price" id="confirm-price-rows"></div>
+          </div>
+
+          <div class="co-success-actions">
+            <button class="co-btn-outline" onclick="window.print()">🖨️ Cetak Bukti</button>
+            <a href="orders.html" class="co-btn-secondary">📋 Cek Pesanan</a>
+            <a href="index.html" class="co-btn-primary">🏠 Belanja Lagi</a>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- end co-form-area -->
+
+    <!-- RIGHT: ORDER SUMMARY SIDEBAR -->
+    <aside class="co-summary" id="order-summary">
+      <div class="co-summary-header">Ringkasan Belanja</div>
+
+      <!-- Items -->
+      <div id="summary-items" style="margin-bottom:12px"></div>
+
+      <!-- Voucher diskon (jika ada) -->
+      <div id="summary-voucher-row" style="display:none" class="co-sum-row discount">
+        <span>Diskon Voucher</span><span id="summary-voucher-val"></span>
+      </div>
+
+      <div class="co-sum-divider"></div>
+      <div class="co-sum-row"><span>Subtotal (<span id="sum-qty">0</span> produk)</span><span id="summary-subtotal">-</span></div>
+      <div class="co-sum-row"><span>Ongkos Kirim</span><span id="summary-shipping">-</span></div>
+      <div class="co-sum-row" id="sum-discount-row" style="display:none"><span>Diskon</span><span id="summary-discount" style="color:#e53935"></span></div>
+      <div class="co-sum-divider"></div>
+      <div class="co-sum-row total"><span>Total Pembayaran</span><span id="summary-total">-</span></div>
+
+      <!-- Keamanan badge -->
+      <div class="co-secure-badge">
+        <span>🔒</span><span>Transaksi kamu dilindungi BOSNIALine</span>
+      </div>
+    </aside>
+
+  </div><!-- end co-layout -->
+</div><!-- end container -->
+
+<script src="app.js"></script>
+<script src="auth.js"></script>
+<script src="checkout.js"></script>
+<script src="i18n.js"></script>
+</body>
+</html>

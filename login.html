@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masuk / Daftar - BOSNIALine</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body class="auth-page-body">
+
+<div class="auth-page-wrap">
+
+  <!-- LEFT PANEL -->
+  <div class="auth-page-left">
+    <a href="index.html" class="auth-page-logo">💻 BOSNIA<span>Line</span></a>
+    <h2>Belanja Lebih Mudah,<br>Lebih Hemat!</h2>
+    <p>Daftar sekarang dan nikmati berbagai keuntungan berbelanja di BOSNIALine</p>
+    <ul class="auth-benefits">
+      <li>✅ Gratis ongkir untuk pembelian pertama</li>
+      <li>✅ Lacak pesanan secara real-time</li>
+      <li>✅ Berbagai metode pembayaran</li>
+      <li>✅ Cicilan 0% kartu kredit</li>
+      <li>✅ Garansi resmi semua produk</li>
+    </ul>
+    <div class="auth-page-illustration">🛒</div>
+  </div>
+
+  <!-- RIGHT PANEL: FORM -->
+  <div class="auth-page-right">
+    <div class="auth-page-card">
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Masuk</button>
+        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Daftar</button>
+      </div>
+
+      <!-- LOGIN -->
+      <form id="form-login" onsubmit="handleLoginPage(event)">
+        <div class="auth-field">
+          <label>Email / No. Telepon</label>
+          <input type="text" id="login-email" placeholder="Email atau nomor telepon" required autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <div class="auth-pw-wrap">
+            <input type="password" id="login-password" placeholder="Password kamu" required autocomplete="current-password">
+            <button type="button" class="auth-pw-toggle" onclick="togglePwPage('login-password',this)">👁</button>
+          </div>
+        </div>
+        <div class="auth-forgot"><a href="#">Lupa password?</a></div>
+        <div id="login-error" class="auth-error" style="display:none"></div>
+        <button type="submit" class="auth-submit-btn">Masuk</button>
+
+        <div class="auth-divider"><span>atau masuk dengan</span></div>
+        <div class="auth-social">
+          <button type="button" class="auth-social-btn" onclick="socialPage('Google')">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Google
+          </button>
+          <button type="button" class="auth-social-btn" onclick="socialPage('Facebook')">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            Facebook
+          </button>
+        </div>
+      </form>
+
+      <!-- REGISTER -->
+      <form id="form-register" onsubmit="handleRegisterPage(event)" style="display:none">
+        <div class="auth-field">
+          <label>Nama Lengkap</label>
+          <input type="text" id="reg-name" placeholder="Nama lengkap kamu" required>
+        </div>
+        <div class="auth-field">
+          <label>Email</label>
+          <input type="email" id="reg-email" placeholder="email@contoh.com" required autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label>No. Telepon</label>
+          <div class="auth-phone-wrap">
+            <span class="auth-phone-prefix">+62</span>
+            <input type="tel" id="reg-phone" placeholder="8xx-xxxx-xxxx" required>
+          </div>
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <div class="auth-pw-wrap">
+            <input type="password" id="reg-password" placeholder="Min. 6 karakter" required minlength="6" autocomplete="new-password" oninput="checkPwStrength(this.value)">
+            <button type="button" class="auth-pw-toggle" onclick="togglePwPage('reg-password',this)">👁</button>
+          </div>
+          <div class="pw-strength-bar"><div id="pw-strength-fill"></div></div>
+          <div id="pw-strength-label" class="pw-strength-label"></div>
+        </div>
+        <div class="auth-field">
+          <label>Konfirmasi Password</label>
+          <div class="auth-pw-wrap">
+            <input type="password" id="reg-password2" placeholder="Ulangi password" required autocomplete="new-password">
+            <button type="button" class="auth-pw-toggle" onclick="togglePwPage('reg-password2',this)">👁</button>
+          </div>
+        </div>
+        <div id="reg-error" class="auth-error" style="display:none"></div>
+        <div class="auth-tos">
+          <input type="checkbox" id="reg-tos" required>
+          <label for="reg-tos">Saya setuju dengan <a href="#">Syarat & Ketentuan</a> dan <a href="#">Kebijakan Privasi</a></label>
+        </div>
+        <button type="submit" class="auth-submit-btn">Daftar Sekarang 🎉</button>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+function switchTab(tab) {
+  document.getElementById("tab-login").classList.toggle("active", tab === "login");
+  document.getElementById("tab-register").classList.toggle("active", tab === "register");
+  document.getElementById("form-login").style.display = tab === "login" ? "block" : "none";
+  document.getElementById("form-register").style.display = tab === "register" ? "block" : "none";
+}
+
+function togglePwPage(id, btn) {
+  const inp = document.getElementById(id);
+  inp.type = inp.type === "password" ? "text" : "password";
+  btn.textContent = inp.type === "password" ? "👁" : "🙈";
+}
+
+function checkPwStrength(val) {
+  const fill = document.getElementById("pw-strength-fill");
+  const label = document.getElementById("pw-strength-label");
+  let score = 0;
+  if (val.length >= 6) score++;
+  if (val.length >= 10) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const levels = [
+    { pct: "20%", color: "#e53935", text: "Sangat Lemah" },
+    { pct: "40%", color: "#ff6f00", text: "Lemah" },
+    { pct: "60%", color: "#ffa000", text: "Cukup" },
+    { pct: "80%", color: "#43a047", text: "Kuat" },
+    { pct: "100%", color: "#2e7d32", text: "Sangat Kuat" }
+  ];
+  const lv = levels[Math.max(0, score - 1)] || levels[0];
+  fill.style.width = lv.pct;
+  fill.style.background = lv.color;
+  label.textContent = val ? lv.text : "";
+  label.style.color = lv.color;
+}
+
+async function handleLoginPage(e) {
+  e.preventDefault();
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
+  const res = await authLogin({ email, password });
+  if (!res.ok) {
+    const el = document.getElementById("login-error");
+    el.textContent = res.msg; el.style.display = "block"; return;
+  }
+  const next = new URLSearchParams(window.location.search).get("next") || "index.html";
+  window.location.href = next;
+}
+
+async function handleRegisterPage(e) {
+  e.preventDefault();
+  const name = document.getElementById("reg-name").value.trim();
+  const email = document.getElementById("reg-email").value.trim();
+  const phone = "+62" + document.getElementById("reg-phone").value.trim();
+  const password = document.getElementById("reg-password").value;
+  const password2 = document.getElementById("reg-password2").value;
+  if (password !== password2) {
+    const el = document.getElementById("reg-error");
+    el.textContent = "Password tidak cocok."; el.style.display = "block"; return;
+  }
+  const res = await authRegister({ name, email, phone, password });
+  if (!res.ok) {
+    const el = document.getElementById("reg-error");
+    el.textContent = res.msg; el.style.display = "block"; return;
+  }
+  window.location.href = "index.html";
+}
+
+async function socialPage(provider) {
+  const email = provider.toLowerCase() + "_demo@bosnialine.id";
+  const users = getUsers();
+  let user = users.find(u => u.email === email);
+  if (!user) {
+    const res = await authRegister({ name: provider + " User", email, phone: "08000000000", password: "social_" + provider });
+    if (!res.ok) return;
+    user = res.user;
+  } else {
+    const res = await authLogin({ email, password: "social_" + provider });
+    if (!res.ok) return;
+    user = res.user;
+  }
+  window.location.href = "index.html";
+}
+
+// Check if already logged in
+const _u = getCurrentUser();
+if (_u) window.location.href = "index.html";
+</script>
+<script src="auth.js"></script>
+</body>
+</html>

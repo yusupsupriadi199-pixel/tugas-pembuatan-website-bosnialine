@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil Saya - BOSNIALine</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="cart.css">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="index.html" class="logo">💻 BOSNIA<span>Line</span></a>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:16px">
+      <a href="index.html" class="nav-btn">← Kembali ke Toko</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container" style="padding-top:28px;padding-bottom:48px">
+  <div class="profile-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="profile-sidebar">
+      <div class="profile-avatar-box" id="profile-avatar-box"></div>
+      <nav class="profile-nav">
+        <button class="profile-nav-item active" onclick="showSection('info')" id="nav-info">👤 Profil Saya</button>
+        <button class="profile-nav-item" onclick="showSection('addresses')" id="nav-addresses">📍 Alamat Saya</button>
+        <button class="profile-nav-item" onclick="showSection('orders')" id="nav-orders">📦 Pesanan Saya</button>
+        <button class="profile-nav-item" onclick="showSection('security')" id="nav-security">🔒 Keamanan</button>
+        <button class="profile-nav-item logout-btn" onclick="authLogout()">🚪 Keluar</button>
+      </nav>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="profile-main">
+
+      <!-- PROFIL INFO -->
+      <section id="section-info" class="profile-section active">
+        <div class="profile-section-header">
+          <h2>Profil Saya</h2>
+          <p>Kelola informasi profil kamu</p>
+        </div>
+        <form class="profile-form" onsubmit="saveProfile(event)">
+          <div class="profile-avatar-upload" id="avatar-upload-area">
+            <div class="avatar-circle" id="avatar-circle"></div>
+            <button type="button" class="btn-change-avatar" onclick="document.getElementById('avatar-file').click()">Ganti Foto</button>
+            <input type="file" id="avatar-file" accept="image/*" style="display:none" onchange="previewAvatar(this)">
+          </div>
+          <div class="pf-grid">
+            <div class="pf-field">
+              <label>Nama Lengkap</label>
+              <input type="text" id="pf-name" required>
+            </div>
+            <div class="pf-field">
+              <label>Username</label>
+              <input type="text" id="pf-username" placeholder="username unik kamu">
+            </div>
+            <div class="pf-field">
+              <label>Email</label>
+              <input type="email" id="pf-email" required>
+            </div>
+            <div class="pf-field">
+              <label>No. Telepon</label>
+              <input type="tel" id="pf-phone">
+            </div>
+            <div class="pf-field">
+              <label>Tanggal Lahir</label>
+              <input type="date" id="pf-dob">
+            </div>
+            <div class="pf-field">
+              <label>Jenis Kelamin</label>
+              <select id="pf-gender">
+                <option value="">-- Pilih --</option>
+                <option value="L">Laki-laki</option>
+                <option value="P">Perempuan</option>
+              </select>
+            </div>
+          </div>
+          <div class="pf-actions">
+            <button type="submit" class="btn-save-profile">💾 Simpan Perubahan</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ALAMAT -->
+      <section id="section-addresses" class="profile-section">
+        <div class="profile-section-header">
+          <h2>Alamat Saya</h2>
+          <button class="btn-add-addr" onclick="openAddressModal()">+ Tambah Alamat</button>
+        </div>
+        <div id="address-list"></div>
+      </section>
+
+      <!-- PESANAN -->
+      <section id="section-orders" class="profile-section">
+        <div class="profile-section-header">
+          <h2>Pesanan Saya</h2>
+        </div>
+        <div class="order-status-tabs" id="order-status-tabs">
+          <button class="ost-btn active" data-status="all" onclick="filterOrders(this)">Semua</button>
+          <button class="ost-btn" data-status="pending" onclick="filterOrders(this)">⏳ Menunggu Bayar</button>
+          <button class="ost-btn" data-status="paid" onclick="filterOrders(this)">✅ Dibayar</button>
+          <button class="ost-btn" data-status="processing" onclick="filterOrders(this)">⚙️ Diproses</button>
+          <button class="ost-btn" data-status="shipped" onclick="filterOrders(this)">🚚 Dikirim</button>
+          <button class="ost-btn" data-status="delivered" onclick="filterOrders(this)">📦 Tiba</button>
+        </div>
+        <div id="profile-orders-list"></div>
+      </section>
+
+      <!-- KEAMANAN -->
+      <section id="section-security" class="profile-section">
+        <div class="profile-section-header">
+          <h2>Keamanan Akun</h2>
+        </div>
+        <div class="security-cards">
+          <div class="security-card">
+            <div class="sc-icon">🔑</div>
+            <div class="sc-info">
+              <div class="sc-title">Password</div>
+              <div class="sc-desc">Ubah password akun kamu secara berkala</div>
+            </div>
+            <button class="sc-btn" onclick="toggleChangePw()">Ubah</button>
+          </div>
+          <div id="change-pw-form" style="display:none" class="change-pw-box">
+            <form onsubmit="changePassword(event)">
+              <div class="pf-field"><label>Password Lama</label>
+                <input type="password" id="pw-old" required></div>
+              <div class="pf-field"><label>Password Baru</label>
+                <input type="password" id="pw-new" required minlength="6"></div>
+              <div class="pf-field"><label>Konfirmasi Password Baru</label>
+                <input type="password" id="pw-new2" required></div>
+              <div id="pw-change-error" class="auth-error" style="display:none"></div>
+              <button type="submit" class="btn-save-profile" style="margin-top:8px">Simpan Password</button>
+            </form>
+          </div>
+          <div class="security-card">
+            <div class="sc-icon">📱</div>
+            <div class="sc-info">
+              <div class="sc-title">Verifikasi 2 Langkah</div>
+              <div class="sc-desc">Tambah lapisan keamanan ekstra</div>
+            </div>
+            <button class="sc-btn" onclick="showToast('Fitur segera hadir!')">Aktifkan</button>
+          </div>
+          <div class="security-card">
+            <div class="sc-icon">🗑️</div>
+            <div class="sc-info">
+              <div class="sc-title">Hapus Akun</div>
+              <div class="sc-desc">Hapus akun dan semua data kamu secara permanen</div>
+            </div>
+            <button class="sc-btn danger" onclick="deleteAccount()">Hapus</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL TAMBAH ALAMAT -->
+<div class="modal-overlay" id="addr-modal" onclick="if(event.target===this)closeAddressModal()">
+  <div class="addr-modal-box" onclick="event.stopPropagation()">
+    <div class="addr-modal-header">
+      <h3 id="addr-modal-title">Tambah Alamat Baru</h3>
+      <button onclick="closeAddressModal()">✕</button>
+    </div>
+    <form onsubmit="saveAddress(event)" style="padding:20px">
+      <input type="hidden" id="addr-edit-id">
+      <div class="pf-grid">
+        <div class="pf-field">
+          <label>Nama Penerima *</label>
+          <input type="text" id="addr-name" required>
+        </div>
+        <div class="pf-field">
+          <label>No. Telepon *</label>
+          <input type="tel" id="addr-phone" required>
+        </div>
+        <div class="pf-field">
+          <label>Provinsi *</label>
+          <select id="addr-province" required>
+            <option value="">-- Pilih Provinsi --</option>
+            <option>DKI Jakarta</option><option>Jawa Barat</option><option>Jawa Tengah</option>
+            <option>Jawa Timur</option><option>Banten</option><option>DI Yogyakarta</option>
+            <option>Sumatera Utara</option><option>Sumatera Selatan</option>
+            <option>Kalimantan Timur</option><option>Sulawesi Selatan</option>
+            <option>Bali</option><option>Lainnya</option>
+          </select>
+        </div>
+        <div class="pf-field">
+          <label>Kota / Kabupaten *</label>
+          <input type="text" id="addr-city" required>
+        </div>
+        <div class="pf-field">
+          <label>Kecamatan</label>
+          <input type="text" id="addr-district">
+        </div>
+        <div class="pf-field">
+          <label>Kode Pos *</label>
+          <input type="text" id="addr-zip" required maxlength="5">
+        </div>
+      </div>
+      <div class="pf-field" style="margin-top:8px">
+        <label>Alamat Lengkap *</label>
+        <textarea id="addr-detail" rows="3" required placeholder="Jl. Nama Jalan No. XX, RT/RW, Kelurahan"></textarea>
+      </div>
+      <div class="pf-field">
+        <label>Label Alamat</label>
+        <div class="addr-label-opts">
+          <label class="addr-label-opt"><input type="radio" name="addr-label" value="Rumah" checked> 🏠 Rumah</label>
+          <label class="addr-label-opt"><input type="radio" name="addr-label" value="Kantor"> 🏢 Kantor</label>
+          <label class="addr-label-opt"><input type="radio" name="addr-label" value="Lainnya"> 📍 Lainnya</label>
+        </div>
+      </div>
+      <div class="pf-field">
+        <label class="addr-default-check">
+          <input type="checkbox" id="addr-is-default"> Jadikan alamat utama
+        </label>
+      </div>
+      <div class="addr-modal-actions">
+        <button type="button" class="btn-cancel-addr" onclick="closeAddressModal()">Batal</button>
+        <button type="submit" class="btn-save-profile">Simpan Alamat</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script src="auth.js"></script>
+<script src="cart.js"></script>
+<script>
+const STATUS_LABELS_P = {
+  pending:    { label: "Menunggu Pembayaran", color: "#ff6f00", bg: "#fff8e1", icon: "⏳" },
+  paid:       { label: "Pembayaran Diterima",  color: "#1565c0", bg: "#e3f2fd", icon: "✅" },
+  processing: { label: "Sedang Diproses",      color: "#6a1b9a", bg: "#f3e5f5", icon: "⚙️" },
+  shipped:    { label: "Dalam Pengiriman",     color: "#00838f", bg: "#e0f7fa", icon: "🚚" },
+  delivered:  { label: "Pesanan Tiba",         color: "#2e7d32", bg: "#e8f5e9", icon: "📦" },
+  cancelled:  { label: "Dibatalkan",           color: "#c62828", bg: "#ffebee", icon: "❌" }
+};
+
+let currentUser = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+  currentUser = requireAuth();
+  if (!currentUser) return;
+  renderSidebar();
+  fillProfileForm();
+  renderAddresses();
+  renderProfileOrders("all");
+
+  // Handle hash navigation
+  const hash = window.location.hash.replace("#","");
+  if (hash) showSection(hash);
+});
+
+function renderSidebar() {
+  const initials = currentUser.name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+  document.getElementById("profile-avatar-box").innerHTML = `
+    <div class="sidebar-avatar">${currentUser.avatar ? `<img src="${currentUser.avatar}" alt="">` : initials}</div>
+    <div class="sidebar-name">${currentUser.name}</div>
+    <div class="sidebar-email">${currentUser.email}</div>
+    <div class="sidebar-since">Member sejak ${currentUser.createdAt?.split(",")[0] || "-"}</div>`;
+}
+
+function fillProfileForm() {
+  document.getElementById("pf-name").value = currentUser.name || "";
+  document.getElementById("pf-email").value = currentUser.email || "";
+  document.getElementById("pf-phone").value = currentUser.phone || "";
+  document.getElementById("pf-username").value = currentUser.username || "";
+  document.getElementById("pf-dob").value = currentUser.dob || "";
+  document.getElementById("pf-gender").value = currentUser.gender || "";
+  const initials = currentUser.name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+  document.getElementById("avatar-circle").innerHTML = currentUser.avatar
+    ? `<img src="${currentUser.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
+    : `<span>${initials}</span>`;
+}
+
+function previewAvatar(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById("avatar-circle").innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    authUpdateProfile({ ...currentUser, avatar: e.target.result });
+    currentUser = getCurrentUser();
+    renderSidebar();
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveProfile(e) {
+  e.preventDefault();
+  authUpdateProfile({
+    id: currentUser.id,
+    name: document.getElementById("pf-name").value.trim(),
+    email: document.getElementById("pf-email").value.trim(),
+    phone: document.getElementById("pf-phone").value.trim(),
+    username: document.getElementById("pf-username").value.trim(),
+    dob: document.getElementById("pf-dob").value,
+    gender: document.getElementById("pf-gender").value
+  });
+  currentUser = getCurrentUser();
+  renderSidebar();
+  injectAuthWidget();
+  showToast("✅ Profil berhasil disimpan!");
+}
+
+function showSection(name) {
+  document.querySelectorAll(".profile-section").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".profile-nav-item").forEach(b => b.classList.remove("active"));
+  document.getElementById("section-" + name)?.classList.add("active");
+  document.getElementById("nav-" + name)?.classList.add("active");
+  if (name === "orders") renderProfileOrders("all");
+  if (name === "addresses") renderAddresses();
+}
+
+// ---- ADDRESSES ----
+function renderAddresses() {
+  currentUser = getCurrentUser();
+  const list = document.getElementById("address-list");
+  if (!currentUser.addresses?.length) {
+    list.innerHTML = `<div class="empty-addr"><div style="font-size:40px">📍</div><p>Belum ada alamat tersimpan</p><button class="btn-add-addr" onclick="openAddressModal()">+ Tambah Alamat</button></div>`;
+    return;
+  }
+  list.innerHTML = currentUser.addresses.map(a => `
+    <div class="addr-card ${a.isDefault ? 'default' : ''}">
+      <div class="addr-card-top">
+        <div class="addr-label-tag">${a.label || "Rumah"}</div>
+        ${a.isDefault ? '<span class="addr-default-tag">Utama</span>' : ''}
+      </div>
+      <div class="addr-name">${a.name} · ${a.phone}</div>
+      <div class="addr-detail">${a.detail}, ${a.district ? a.district + ', ' : ''}${a.city}, ${a.province} ${a.zip}</div>
+      <div class="addr-actions">
+        <button onclick="editAddress('${a.id}')">✏️ Ubah</button>
+        ${!a.isDefault ? `<button onclick="setDefaultAddr('${a.id}')">⭐ Jadikan Utama</button>` : ''}
+        <button class="del-btn" onclick="deleteAddr('${a.id}')">🗑️ Hapus</button>
+      </div>
+    </div>`).join("");
+}
+
+function openAddressModal(editId) {
+  document.getElementById("addr-edit-id").value = editId || "";
+  document.getElementById("addr-modal-title").textContent = editId ? "Ubah Alamat" : "Tambah Alamat Baru";
+  if (editId) {
+    const a = currentUser.addresses.find(x => x.id === editId);
+    if (a) {
+      document.getElementById("addr-name").value = a.name;
+      document.getElementById("addr-phone").value = a.phone;
+      document.getElementById("addr-province").value = a.province;
+      document.getElementById("addr-city").value = a.city;
+      document.getElementById("addr-district").value = a.district || "";
+      document.getElementById("addr-zip").value = a.zip;
+      document.getElementById("addr-detail").value = a.detail;
+      document.getElementById("addr-is-default").checked = a.isDefault || false;
+      document.querySelectorAll("input[name='addr-label']").forEach(r => r.checked = r.value === (a.label || "Rumah"));
+    }
+  } else {
+    document.getElementById("addr-name").value = currentUser.name;
+    document.getElementById("addr-phone").value = currentUser.phone || "";
+    ["addr-province","addr-city","addr-district","addr-zip","addr-detail"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("addr-is-default").checked = false;
+  }
+  document.getElementById("addr-modal").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeAddressModal() {
+  document.getElementById("addr-modal").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function saveAddress(e) {
+  e.preventDefault();
+  const editId = document.getElementById("addr-edit-id").value;
+  const label = document.querySelector("input[name='addr-label']:checked")?.value || "Rumah";
+  const addr = {
+    name: document.getElementById("addr-name").value.trim(),
+    phone: document.getElementById("addr-phone").value.trim(),
+    province: document.getElementById("addr-province").value,
+    city: document.getElementById("addr-city").value.trim(),
+    district: document.getElementById("addr-district").value.trim(),
+    zip: document.getElementById("addr-zip").value.trim(),
+    detail: document.getElementById("addr-detail").value.trim(),
+    label,
+    isDefault: document.getElementById("addr-is-default").checked
+  };
+  if (editId) {
+    addr.id = editId;
+    const users = getUsers();
+    const idx = users.findIndex(u => u.id === currentUser.id);
+    const ai = users[idx].addresses.findIndex(a => a.id === editId);
+    if (ai !== -1) users[idx].addresses[ai] = addr;
+    if (addr.isDefault) users[idx].addresses.forEach(a => { if (a.id !== editId) a.isDefault = false; });
+    saveUsers(users);
+  } else {
+    authAddAddress(currentUser.id, addr);
+    if (addr.isDefault) authSetDefaultAddress(currentUser.id, addr.id);
+  }
+  currentUser = getCurrentUser();
+  closeAddressModal();
+  renderAddresses();
+  showToast("✅ Alamat berhasil disimpan!");
+}
+
+function editAddress(id) { openAddressModal(id); }
+function setDefaultAddr(id) { authSetDefaultAddress(currentUser.id, id); currentUser = getCurrentUser(); renderAddresses(); showToast("✅ Alamat utama diperbarui!"); }
+function deleteAddr(id) {
+  if (!confirm("Hapus alamat ini?")) return;
+  authDeleteAddress(currentUser.id, id);
+  currentUser = getCurrentUser();
+  renderAddresses();
+  showToast("Alamat dihapus.");
+}
+
+// ---- ORDERS ----
+function renderProfileOrders(statusFilter) {
+  const all = JSON.parse(localStorage.getItem("bosnialine_orders") || "[]");
+  const orders = all.filter(o => o.userId === currentUser.id || !o.userId); // fallback: show all if no userId
+  const filtered = statusFilter === "all" ? orders : orders.filter(o => (o.status || "pending") === statusFilter);
+  const el = document.getElementById("profile-orders-list");
+  if (!filtered.length) {
+    el.innerHTML = `<div class="empty-addr" style="margin-top:24px"><div style="font-size:40px">📭</div><p>Tidak ada pesanan</p><a href="index.html" class="btn-add-addr">Mulai Belanja</a></div>`;
+    return;
+  }
+  el.innerHTML = filtered.map(o => {
+    const s = STATUS_LABELS_P[o.status || "pending"];
+    const itemCount = o.items.reduce((sum, i) => sum + i.qty, 0);
+    return `
+      <div class="profile-order-card">
+        <div class="poc-top">
+          <div>
+            <span class="poc-id">${o.id}</span>
+            <span class="poc-date">${o.date}</span>
+          </div>
+          <span class="status-badge" style="background:${s.bg};color:${s.color};border:1.5px solid ${s.color}40">${s.icon} ${s.label}</span>
+        </div>
+        <div class="poc-items">
+          ${o.items.slice(0,3).map(i => `<img src="${i.image}" alt="${i.name}" title="${i.name}">`).join("")}
+          ${o.items.length > 3 ? `<div class="order-more-items">+${o.items.length-3}</div>` : ""}
+          <div style="margin-left:auto;text-align:right">
+            <div style="font-size:12px;color:#9e9e9e">${itemCount} item</div>
+            <div style="font-size:15px;font-weight:800;color:var(--primary)">${formatPrice(o.total)}</div>
+          </div>
+        </div>
+        <div class="poc-footer">
+          <span style="font-size:12px;color:#9e9e9e">via ${(o.payment||"-").toUpperCase()} · ${o.shipping?.label||"-"}</span>
+          <a href="orders.html" class="poc-detail-btn">Lihat Detail →</a>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function filterOrders(btn) {
+  document.querySelectorAll(".ost-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderProfileOrders(btn.dataset.status);
+}
+
+// ---- SECURITY ----
+function toggleChangePw() {
+  const f = document.getElementById("change-pw-form");
+  f.style.display = f.style.display === "none" ? "block" : "none";
+}
+
+function changePassword(e) {
+  e.preventDefault();
+  const oldPw = document.getElementById("pw-old").value;
+  const newPw = document.getElementById("pw-new").value;
+  const newPw2 = document.getElementById("pw-new2").value;
+  const errEl = document.getElementById("pw-change-error");
+  if (currentUser.password !== oldPw) { errEl.textContent = "Password lama salah."; errEl.style.display = "block"; return; }
+  if (newPw !== newPw2) { errEl.textContent = "Password baru tidak cocok."; errEl.style.display = "block"; return; }
+  authUpdateProfile({ id: currentUser.id, password: newPw });
+  currentUser = getCurrentUser();
+  errEl.style.display = "none";
+  document.getElementById("change-pw-form").style.display = "none";
+  showToast("✅ Password berhasil diubah!");
+}
+
+function deleteAccount() {
+  if (!confirm("Yakin ingin menghapus akun? Semua data akan hilang permanen.")) return;
+  const users = getUsers().filter(u => u.id !== currentUser.id);
+  saveUsers(users);
+  clearSession();
+  window.location.href = "index.html";
+}
+</script>
+</body>
+</html>

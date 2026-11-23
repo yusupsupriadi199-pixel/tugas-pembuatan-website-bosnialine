@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOSNIALine - Toko Komputer & Laptop Terpercaya</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="cart.css">
+  <link rel="stylesheet" href="i18n.css">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="index.html" class="logo">💻 TOKO KOMPUTER BOSNIA<span>Line</span></a>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Cari laptop, komputer, aksesoris..." />
+      <button onclick="doSearch()">🔍</button>
+    </div>
+    <div class="nav-actions">
+      <a href="admin.html" class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span data-i18n="nav_admin">Admin</span>
+      </a>
+      <a href="search.html" class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <span data-i18n="nav_search">Cari</span>
+      </a>
+      <button class="nav-btn cart-trigger" style="position:relative">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge" id="cart-badge" style="display:none">0</span>
+        <span data-i18n="nav_cart"></span>Keranjang</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="cat-nav">
+  <div class="cat-nav-inner">
+    <a href="search.html?cat=semua" class="active" data-i18n="cat_all">Semua</a>
+    <a href="search.html?cat=laptop" data-i18n="cat_laptop">Laptop</a>
+    <a href="search.html?cat=komputer" data-i18n="cat_komputer">Komputer</a>
+    <a href="search.html?cat=monitor" data-i18n="cat_monitor">Monitor</a>
+    <a href="search.html?cat=aksesoris" data-i18n="cat_aksesoris">Aksesoris</a>
+    <a href="search.html?cat=printer" data-i18n="cat_printer">Printer</a>
+    <a href="search.html?cat=networking" data-i18n="cat_networking">Networking</a>
+    <a href="search.html?cat=storage" data-i18n="cat_storage">Storage</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- BANNER -->
+  <div class="banner-section">
+    <div class="banner-slider" id="banner">
+      <div class="banner-content">
+        <span class="tag" data-i18n="banner_tag">🔥 FLASH SALE HARI INI</span>
+        <h1 data-i18n="banner_h1" data-i18n-html>Laptop & PC Gaming<br>Harga Terbaik!</h1>
+        <p data-i18n="banner_p">Diskon hingga 20% untuk semua produk pilihan BOSNIALine</p>
+        <a href="search.html" class="btn-banner" data-i18n="banner_btn">Belanja Sekarang →</a>
+      </div>
+      <div class="banner-dots">
+        <span class="active"></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROMO STRIP -->
+  <div class="promo-strip">
+    <a href="layanan.html#ongkir" class="promo-card">
+      <div class="promo-icon">🚚</div>
+      <div><h4 data-i18n="promo_ongkir_title">Gratis Ongkir</h4><p data-i18n="promo_ongkir_desc">Untuk pembelian di atas Rp 500rb</p></div>
+    </a>
+    <a href="layanan.html#garansi" class="promo-card">
+      <div class="promo-icon">🛡️</div>
+      <div><h4 data-i18n="promo_garansi_title">Garansi Resmi</h4><p data-i18n="promo_garansi_desc">Semua produk bergaransi resmi</p></div>
+    </a>
+    <a href="layanan.html#retur" class="promo-card">
+      <div class="promo-icon">↩️</div>
+      <div><h4 data-i18n="promo_retur_title">Retur 7 Hari</h4><p data-i18n="promo_retur_desc">Tidak puas? Kembalikan saja</p></div>
+    </a>
+    <a href="layanan.html#cicilan" class="promo-card">
+      <div class="promo-icon">💳</div>
+      <div><h4 data-i18n="promo_cicilan_title">Cicilan 0%</h4><p data-i18n="promo_cicilan_desc">Tersedia cicilan tanpa bunga</p></div>
+    </a>
+  </div>
+
+  <!-- KATEGORI -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title" data-i18n="sec_kategori">Kategori Produk</h2>
+      <a href="search.html" class="see-all" data-i18n="see_all">Lihat Semua →</a>
+    </div>
+    <div class="cat-grid">
+      <a href="search.html?cat=laptop" class="cat-item">
+        <div class="icon">💻</div><span>Laptop</span>
+      </a>
+      <a href="search.html?cat=komputer" class="cat-item">
+        <div class="icon">🖥️</div><span>Komputer</span>
+      </a>
+      <a href="search.html?cat=monitor" class="cat-item">
+        <div class="icon">🖵</div><span>Monitor</span>
+      </a>
+      <a href="search.html?cat=aksesoris" class="cat-item">
+        <div class="icon">⌨️</div><span>Aksesoris</span>
+      </a>
+      <a href="search.html?cat=printer" class="cat-item">
+        <div class="icon">🖨️</div><span>Printer</span>
+      </a>
+      <a href="search.html?cat=storage" class="cat-item">
+        <div class="icon">💾</div><span>Storage</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- REKOMENDASI LAPTOP -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title" data-i18n="sec_laptop">Rekomendasi Laptop</h2>
+      <a href="search.html?cat=laptop" class="see-all" data-i18n="see_all">Lihat Semua →</a>
+    </div>
+    <div class="product-grid" id="laptop-grid"></div>
+  </div>
+
+  <!-- REKOMENDASI KOMPUTER -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title" data-i18n="sec_komputer">Rekomendasi Komputer</h2>
+      <a href="search.html?cat=komputer" class="see-all" data-i18n="see_all">Lihat Semua →</a>
+    </div>
+    <div class="product-grid" id="komputer-grid"></div>
+  </div>
+
+  <!-- SEMUA PRODUK -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title" data-i18n="sec_terlaris">Produk Terlaris</h2>
+      <a href="search.html" class="see-all" data-i18n="see_all">Lihat Semua →</a>
+    </div>
+    <div class="product-grid" id="all-grid"></div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">💻 TOKO KOMPUTER BOSNIA<span>Line</span></div>
+      <p data-i18n="footer_desc">Toko komputer dan laptop terpercaya dengan produk original bergaransi resmi. Melayani seluruh Indonesia sejak 2010.</p>
+    </div>
+    <div class="footer-col">
+      <h4 data-i18n="footer_layanan">Layanan</h4>
+      <ul>
+        <li><a href="orders.html" data-i18n="footer_pemesanan">Cara Pemesanan</a></li>
+        <li><a href="layanan.html#ongkir" data-i18n="footer_pengiriman">Pengiriman</a></li>
+        <li><a href="layanan.html#retur" data-i18n="footer_pengembalian">Pengembalian</a></li>
+        <li><a href="layanan.html#garansi" data-i18n="footer_garansi">Garansi</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4 data-i18n="footer_kategori">Kategori</h4>
+      <ul>
+        <li><a href="search.html?cat=laptop" data-i18n="cat_laptop">Laptop</a></li>
+        <li><a href="search.html?cat=komputer" data-i18n="cat_komputer">Komputer</a></li>
+        <li><a href="search.html?cat=monitor" data-i18n="cat_monitor">Monitor</a></li>
+        <li><a href="search.html?cat=aksesoris" data-i18n="cat_aksesoris">Aksesoris</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4 data-i18n="footer_hubungi">Hubungi Kami</h4>
+      <ul>
+        <li><a href="#">📞 0857-1644-4966</a></li>
+        <li><a href="#">📧 cs@bosnialine.id</a></li>
+        <li><a href="https://wa.me/6285716444966?text=Halo%20BOSNIALine%2C%20saya%20ingin%20bertanya%20tentang%20produk" target="_blank">💬 Live Chat (WhatsApp)</a></li>
+        <li><a href="#">📍 Jl.Abd Fatah Kp.Cibitung Pasar Jum'at Ds.Cibitung Kec.Tenjolaya, Indonesia</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p data-i18n="footer_copy">© 2026 BOSNIALine. Semua hak dilindungi.</p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script src="auth.js"></script>
+<script src="cart.js"></script>
+<script src="i18n.js"></script>
+<script>
+function doSearch() {
+  const q = document.getElementById("search-input").value.trim();
+  if (q) window.location.href = `search.html?q=${encodeURIComponent(q)}`;
+  else window.location.href = "search.html";
+}
+document.getElementById("search-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") doSearch();
+});
+
+function renderCard(p) {
+  const badgeClass = p.badge === "Premium" ? "premium" : p.badge === "Baru" ? "baru" : p.badge === "Second" ? "second" : "";
+  return `
+    <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'">
+      <span class="product-badge ${badgeClass}">${p.badge}</span>
+      <img class="product-img" src="${p.image}" alt="${p.name}" loading="lazy">
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div>
+          <span class="product-original">${formatPrice(p.originalPrice)}</span>
+          <span class="product-discount">-${p.discount}%</span>
+        </div>
+        <div class="product-price">${formatPrice(p.price)}</div>
+        <div class="product-rating">
+          <span class="stars">${renderStars(p.rating)}</span>
+          <span class="rating-count">${p.rating}</span>
+          <span class="product-sold">| ${p.sold.toLocaleString("id-ID")} <span data-i18n="sold">${t('sold')}</span></span>
+        </div>
+      </div>
+      <button class="btn-cart" onclick="event.stopPropagation(); addToCart(${p.id})" data-i18n="btn_cart">${t('btn_cart')}</button>
+    </div>`;
+}
+
+const laptops = products.filter(p => p.category === "laptop");
+const komputers = products.filter(p => p.category === "komputer");
+
+document.getElementById("laptop-grid").innerHTML = laptops.map(renderCard).join("");
+document.getElementById("komputer-grid").innerHTML = komputers.map(renderCard).join("");
+document.getElementById("all-grid").innerHTML = products.sort((a,b) => b.sold - a.sold).slice(0,4).map(renderCard).join("");
+</script>
+</body>
+</html>
